@@ -749,6 +749,49 @@
   font-size: 0.9rem;
 }
 
+/* Selected category styles */
+.selectedCategory {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+  border: 2px solid #667eea;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.selectedCategory .categoryName {
+  color: #667eea;
+  font-weight: 600;
+}
+
+.selectedCategory .categoryCount {
+  color: #667eea;
+}
+
+/* Section title container for category filtering */
+.sectionTitleContainer {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.clearFilterBtn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.clearFilterBtn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
 /* Products Section */
 .productsSection {
   padding: 4rem 2rem;

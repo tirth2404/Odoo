@@ -27,6 +27,7 @@ const LandingPage = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [activeFilter, setActiveFilter] = useState("All");
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
   // API data states
   const [featuredItems, setFeaturedItems] = useState([]);
@@ -199,11 +200,21 @@ const LandingPage = () => {
     }
   };
 
-  // Filter products based on active filter
+  // Filter products based on active filter and selected category
   const getFilteredProducts = () => {
-    if (activeFilter === "All") return products;
+    let filteredProducts = products;
 
-    return products.filter((product) => {
+    // First filter by selected category
+    if (selectedCategory) {
+      filteredProducts = filteredProducts.filter((product) => 
+        product.category?.toLowerCase() === selectedCategory.toLowerCase()
+      );
+    }
+
+    // Then apply active filter
+    if (activeFilter === "All") return filteredProducts;
+
+    return filteredProducts.filter((product) => {
       switch (activeFilter) {
         case "Trending":
           return featuredItems.some((item) => item._id === product._id);
@@ -322,6 +333,18 @@ const LandingPage = () => {
   // Handle filter button clicks
   const handleFilterClick = (filter) => {
     setActiveFilter(filter);
+  };
+
+  // Handle category clicks
+  const handleCategoryClick = (category) => {
+    setSelectedCategory(category.name);
+    setActiveFilter("All"); // Reset filter when category is selected
+    // Scroll to products section
+    scrollToSection(productsSectionRef, 120);
+  };
+
+  const clearCategoryFilter = () => {
+    setSelectedCategory(null);
   };
 
   // Close search results when clicking outside
@@ -682,7 +705,11 @@ const LandingPage = () => {
         ) : (
           <div className={styles.categoriesGrid}>
             {categories.map((category) => (
-              <div key={category.id} className={styles.categoryCard}>
+              <div 
+                key={category.id} 
+                className={`${styles.categoryCard} ${selectedCategory === category.name ? styles.selectedCategory : ''}`}
+                onClick={() => handleCategoryClick(category)}
+              >
                 <div className={styles.categoryIcon}>
                   <span className={styles.categoryEmoji}>{category.icon}</span>
                 </div>
@@ -697,7 +724,19 @@ const LandingPage = () => {
       {/* Product Listings */}
       <section ref={productsSectionRef} className={styles.productsSection}>
         <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>Available Items</h2>
+          <div className={styles.sectionTitleContainer}>
+            <h2 className={styles.sectionTitle}>
+              {selectedCategory ? `${selectedCategory} Items` : 'Available Items'}
+            </h2>
+            {selectedCategory && (
+              <button 
+                className={styles.clearFilterBtn}
+                onClick={clearCategoryFilter}
+              >
+                Clear Filter
+              </button>
+            )}
+          </div>
           <div className={styles.filterButtons}>
             <button
               className={`${styles.filterBtn} ${
