@@ -483,7 +483,7 @@ const LandingPage = () => {
               Login
             </Link>
             <Link
-              to="/signup"
+              to="/register"
               className={`${styles.authLink} ${styles.signupBtn}`}
             >
               Sign Up
