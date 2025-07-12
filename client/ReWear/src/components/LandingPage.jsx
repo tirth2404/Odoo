@@ -17,6 +17,7 @@ import {
   FaRecycle,
   FaTree,
   FaWater,
+  FaSpinner,
 } from "react-icons/fa";
 
 const LandingPage = () => {
@@ -27,165 +28,133 @@ const LandingPage = () => {
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [activeFilter, setActiveFilter] = useState("All");
 
+  // API data states
+  const [featuredItems, setFeaturedItems] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState({
+    featured: true,
+    products: true,
+    categories: true
+  });
+  const [error, setError] = useState({
+    featured: null,
+    products: null,
+    categories: null
+  });
+
   // Refs for sections
   const categoriesSectionRef = useRef(null);
   const productsSectionRef = useRef(null);
   const carouselSectionRef = useRef(null);
 
-  // Featured items for carousel
-  const featuredItems = [
-    {
-      id: 1,
-      name: "Vintage Denim Jacket",
-      category: "Outerwear",
-      size: "M",
-      condition: "Excellent",
-      points: 150,
-      image: "👕",
-      type: "trending",
-      location: "New York",
-    },
-    {
-      id: 2,
-      name: "Summer Floral Dress",
-      category: "Dresses",
-      size: "S",
-      condition: "Good",
-      points: 120,
-      image: "👗",
-      type: "popular",
-      location: "Los Angeles",
-    },
-    {
-      id: 3,
-      name: "Classic White Sneakers",
-      category: "Footwear",
-      size: "8",
-      condition: "Like New",
-      points: 200,
-      image: "👟",
-      type: "recent",
-      location: "Chicago",
-    },
-    {
-      id: 4,
-      name: "Leather Crossbody Bag",
-      category: "Accessories",
-      size: "One Size",
-      condition: "Excellent",
-      points: 180,
-      image: "👜",
-      type: "trending",
-      location: "Miami",
-    },
-    {
-      id: 5,
-      name: "Cozy Winter Sweater",
-      category: "Sweaters",
-      size: "L",
-      condition: "Good",
-      points: 100,
-      image: "🧥",
-      type: "popular",
-      location: "Seattle",
-    },
-  ];
+  // API base URL
+  const API_BASE_URL = 'http://localhost:3000/api';
 
-  // Categories
-  const categories = [
-    { id: 1, name: "Men's Clothing", icon: "👔", count: "2.5K items" },
-    { id: 2, name: "Women's Clothing", icon: "👗", count: "4.2K items" },
-    { id: 3, name: "Kids", icon: "👶", count: "1.8K items" },
-    { id: 4, name: "Accessories", icon: "👜", count: "3.1K items" },
-    { id: 5, name: "Footwear", icon: "👟", count: "2.9K items" },
-    { id: 6, name: "Outerwear", icon: "🧥", count: "1.6K items" },
-  ];
+  // Fetch featured items
+  const fetchFeaturedItems = async () => {
+    try {
+      setLoading(prev => ({ ...prev, featured: true }));
+      setError(prev => ({ ...prev, featured: null }));
+      
+      const response = await fetch(`${API_BASE_URL}/items/featured`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setFeaturedItems(data.data);
+      } else {
+        setError(prev => ({ ...prev, featured: data.message || 'Failed to fetch featured items' }));
+      }
+    } catch (err) {
+      setError(prev => ({ ...prev, featured: 'Network error while fetching featured items' }));
+    } finally {
+      setLoading(prev => ({ ...prev, featured: false }));
+    }
+  };
 
-  // Product listings
-  const products = [
-    {
-      id: 1,
-      name: "Blue Denim Jeans",
-      size: "32x32",
-      condition: "Excellent",
-      points: 120,
-      image: "👖",
-      location: "New York",
-      category: "Men's Clothing",
-    },
-    {
-      id: 2,
-      name: "Red Summer Dress",
-      size: "M",
-      condition: "Good",
-      points: 90,
-      image: "👗",
-      location: "Los Angeles",
-      category: "Women's Clothing",
-    },
-    {
-      id: 3,
-      name: "Black Leather Jacket",
-      size: "L",
-      condition: "Like New",
-      points: 250,
-      image: "🧥",
-      location: "Chicago",
-      category: "Outerwear",
-    },
-    {
-      id: 4,
-      name: "White Sneakers",
-      size: "9",
-      condition: "Excellent",
-      points: 180,
-      image: "👟",
-      location: "Miami",
-      category: "Footwear",
-    },
-    {
-      id: 5,
-      name: "Floral Blouse",
-      size: "S",
-      condition: "Good",
-      points: 75,
-      image: "👚",
-      location: "Seattle",
-      category: "Women's Clothing",
-    },
-    {
-      id: 6,
-      name: "Designer Handbag",
-      size: "One Size",
-      condition: "Excellent",
-      points: 300,
-      image: "👜",
-      location: "Boston",
-      category: "Accessories",
-    },
-    {
-      id: 7,
-      name: "Striped T-shirt",
-      size: "M",
-      condition: "Good",
-      points: 60,
-      image: "👕",
-      location: "Austin",
-      category: "Men's Clothing",
-    },
-    {
-      id: 8,
-      name: "Winter Boots",
-      size: "7",
-      condition: "Like New",
-      points: 220,
-      image: "👢",
-      location: "Denver",
-      category: "Footwear",
-    },
-  ];
+  // Fetch all products
+  const fetchProducts = async () => {
+    try {
+      setLoading(prev => ({ ...prev, products: true }));
+      setError(prev => ({ ...prev, products: null }));
+      
+      const response = await fetch(`${API_BASE_URL}/items?limit=20&sort=newest`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setProducts(data.data);
+      } else {
+        setError(prev => ({ ...prev, products: data.message || 'Failed to fetch products' }));
+      }
+    } catch (err) {
+      setError(prev => ({ ...prev, products: 'Network error while fetching products' }));
+    } finally {
+      setLoading(prev => ({ ...prev, products: false }));
+    }
+  };
 
-  // Testimonials
+  // Fetch categories
+  const fetchCategories = async () => {
+    try {
+      setLoading(prev => ({ ...prev, categories: true }));
+      setError(prev => ({ ...prev, categories: null }));
+      
+      const response = await fetch(`${API_BASE_URL}/items/categories`);
+      const data = await response.json();
+      
+      if (data.success) {
+        // Transform categories to match the expected format
+        const transformedCategories = data.data.map((category, index) => ({
+          id: index + 1,
+          name: category.charAt(0).toUpperCase() + category.slice(1),
+          icon: getCategoryIcon(category),
+          count: `${Math.floor(Math.random() * 5) + 1}K items` // Mock count for now
+        }));
+        setCategories(transformedCategories);
+      } else {
+        setError(prev => ({ ...prev, categories: data.message || 'Failed to fetch categories' }));
+      }
+    } catch (err) {
+      setError(prev => ({ ...prev, categories: 'Network error while fetching categories' }));
+    } finally {
+      setLoading(prev => ({ ...prev, categories: false }));
+    }
+  };
+
+  // Get category icon based on category name
+  const getCategoryIcon = (category) => {
+    const iconMap = {
+      "men's clothing": "👔",
+      "women's clothing": "👗",
+      "kids": "👶",
+      "accessories": "👜",
+      "footwear": "👟",
+      "outerwear": "🧥"
+    };
+    return iconMap[category.toLowerCase()] || "👕";
+  };
+
+  // Get item emoji based on category
+  const getItemEmoji = (category) => {
+    const emojiMap = {
+      "men's clothing": "👔",
+      "women's clothing": "👗",
+      "kids": "👶",
+      "accessories": "👜",
+      "footwear": "👟",
+      "outerwear": "🧥"
+    };
+    return emojiMap[category?.toLowerCase()] || "👕";
+  };
+
+  // Load data on component mount
+  useEffect(() => {
+    fetchFeaturedItems();
+    fetchProducts();
+    fetchCategories();
+  }, []);
+
+  // Testimonials (keeping static for now)
   const testimonials = [
     {
       id: 1,
@@ -227,14 +196,14 @@ const LandingPage = () => {
     return products.filter((product) => {
       switch (activeFilter) {
         case "Trending":
-          return featuredItems.some((item) => item.name === product.name);
+          return featuredItems.some((item) => item._id === product._id);
         case "New":
           return (
             product.condition === "Like New" ||
             product.condition === "Excellent"
           );
         case "Popular":
-          return product.points > 150;
+          return product.pointsValue > 150;
         default:
           return product.category === activeFilter;
       }
@@ -258,10 +227,10 @@ const LandingPage = () => {
       // Search in products
       const productResults = products.filter(
         (product) =>
-          product.name.toLowerCase().includes(lowerQuery) ||
+          product.title?.toLowerCase().includes(lowerQuery) ||
           product.category?.toLowerCase().includes(lowerQuery) ||
-          product.condition.toLowerCase().includes(lowerQuery) ||
-          product.location.toLowerCase().includes(lowerQuery)
+          product.condition?.toLowerCase().includes(lowerQuery) ||
+          product.location?.toLowerCase().includes(lowerQuery)
       );
 
       // Search in categories
@@ -272,9 +241,9 @@ const LandingPage = () => {
       // Search in featured items
       const featuredResults = featuredItems.filter(
         (item) =>
-          item.name.toLowerCase().includes(lowerQuery) ||
-          item.category.toLowerCase().includes(lowerQuery) ||
-          item.location.toLowerCase().includes(lowerQuery)
+          item.title?.toLowerCase().includes(lowerQuery) ||
+          item.category?.toLowerCase().includes(lowerQuery) ||
+          item.location?.toLowerCase().includes(lowerQuery)
       );
 
       const allResults = [
@@ -314,7 +283,7 @@ const LandingPage = () => {
   // Handle search result click
   const handleSearchResultClick = (result) => {
     console.log("Selected result:", result);
-    setSearchQuery(result.name);
+    setSearchQuery(result.title || result.name);
     setShowSearchResults(false);
 
     // Navigate to appropriate section based on result type
@@ -336,7 +305,7 @@ const LandingPage = () => {
     // Add a visual feedback
     setTimeout(() => {
       // You could add a highlight effect here
-      console.log(`Navigated to ${result.type} section for: ${result.name}`);
+      console.log(`Navigated to ${result.type} section for: ${result.title || result.name}`);
     }, 500);
   };
 
@@ -361,10 +330,12 @@ const LandingPage = () => {
 
   // Auto-scroll carousel
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % featuredItems.length);
-    }, 4000);
-    return () => clearInterval(interval);
+    if (featuredItems.length > 0) {
+      const interval = setInterval(() => {
+        setCurrentSlide((prev) => (prev + 1) % featuredItems.length);
+      }, 4000);
+      return () => clearInterval(interval);
+    }
   }, [featuredItems.length]);
 
   const nextSlide = () => {
@@ -426,7 +397,7 @@ const LandingPage = () => {
                         </div>
                         {searchResults.slice(0, 8).map((result, index) => (
                           <div
-                            key={`${result.type}-${result.id}-${index}`}
+                            key={`${result.type}-${result._id || result.id}-${index}`}
                             className={styles.searchResultItem}
                             onClick={() => handleSearchResultClick(result)}
                           >
@@ -437,13 +408,13 @@ const LandingPage = () => {
                             </div>
                             <div className={styles.searchResultContent}>
                               <div className={styles.searchResultName}>
-                                {result.name}
+                                {result.title || result.name}
                               </div>
                               <div className={styles.searchResultMeta}>
                                 {result.type === "product" && (
                                   <>
                                     <span>{result.condition}</span>
-                                    <span>{result.points} pts</span>
+                                    <span>{result.pointsValue} pts</span>
                                     <span>{result.location}</span>
                                   </>
                                 )}
@@ -453,7 +424,7 @@ const LandingPage = () => {
                                 {result.type === "featured" && (
                                   <>
                                     <span>{result.category}</span>
-                                    <span>{result.points} pts</span>
+                                    <span>{result.pointsValue} pts</span>
                                   </>
                                 )}
                               </div>
@@ -544,67 +515,89 @@ const LandingPage = () => {
           </div>
         </div>
 
-        <div className={styles.carouselContainer}>
-          <div
-            className={styles.carouselTrack}
-            style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-          >
-            {featuredItems.map((item, index) => (
-              <div key={item.id} className={styles.carouselItem}>
-                <div className={styles.featuredCard}>
-                  <div className={styles.itemImage}>
-                    <span className={styles.itemEmoji}>{item.image}</span>
-                    <div className={styles.itemBadge}>
-                      {item.type === "trending" && (
-                        <span className={styles.trendingBadge}>
-                          🔥 Trending
+        {loading.featured ? (
+          <div className={styles.loadingContainer}>
+            <FaSpinner className={styles.spinner} />
+            <p>Loading featured items...</p>
+          </div>
+        ) : error.featured ? (
+          <div className={styles.errorContainer}>
+            <p>Error: {error.featured}</p>
+            <button onClick={fetchFeaturedItems} className={styles.retryBtn}>
+              Retry
+            </button>
+          </div>
+        ) : featuredItems.length === 0 ? (
+          <div className={styles.emptyContainer}>
+            <p>No featured items available</p>
+          </div>
+        ) : (
+          <div className={styles.carouselContainer}>
+            <div
+              className={styles.carouselTrack}
+              style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+            >
+              {featuredItems.map((item, index) => (
+                <div key={item._id} className={styles.carouselItem}>
+                  <div className={styles.featuredCard}>
+                    <div className={styles.itemImage}>
+                      {item.images && item.images.length > 0 ? (
+                        <img 
+                          src={`http://localhost:3000${item.images[0].url}`} 
+                          alt={item.title}
+                          className={styles.itemImage}
+                        />
+                      ) : (
+                        <span className={styles.itemEmoji}>
+                          {getItemEmoji(item.category)}
                         </span>
                       )}
-                      {item.type === "popular" && (
-                        <span className={styles.popularBadge}>⭐ Popular</span>
-                      )}
-                      {item.type === "recent" && (
-                        <span className={styles.recentBadge}>🆕 Recent</span>
-                      )}
+                      <div className={styles.itemBadge}>
+                        <span className={styles.featuredBadge}>
+                          ⭐ Featured
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                  <div className={styles.itemInfo}>
-                    <h3 className={styles.itemName}>{item.name}</h3>
-                    <p className={styles.itemCategory}>{item.category}</p>
-                    <div className={styles.itemDetails}>
-                      <span className={styles.itemSize}>Size: {item.size}</span>
-                      <span className={styles.itemCondition}>
-                        {item.condition}
-                      </span>
+                    <div className={styles.itemInfo}>
+                      <h3 className={styles.itemName}>{item.title}</h3>
+                      <p className={styles.itemCategory}>{item.category}</p>
+                      <div className={styles.itemDetails}>
+                        <span className={styles.itemSize}>Size: {item.size}</span>
+                        <span className={styles.itemCondition}>
+                          {item.condition}
+                        </span>
+                      </div>
+                      <div className={styles.itemMeta}>
+                        <span className={styles.itemPoints}>
+                          {item.pointsValue} pts
+                        </span>
+                        <span className={styles.itemLocation}>
+                          <FaMapMarkerAlt className={styles.locationIcon} />
+                          {item.location}
+                        </span>
+                      </div>
+                      <button className={styles.swapBtn}>Request Swap</button>
                     </div>
-                    <div className={styles.itemMeta}>
-                      <span className={styles.itemPoints}>
-                        {item.points} pts
-                      </span>
-                      <span className={styles.itemLocation}>
-                        <FaMapMarkerAlt className={styles.locationIcon} />
-                        {item.location}
-                      </span>
-                    </div>
-                    <button className={styles.swapBtn}>Request Swap</button>
                   </div>
                 </div>
-              </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {featuredItems.length > 0 && (
+          <div className={styles.carouselDots}>
+            {featuredItems.map((_, index) => (
+              <button
+                key={index}
+                className={`${styles.dot} ${
+                  index === currentSlide ? styles.activeDot : ""
+                }`}
+                onClick={() => setCurrentSlide(index)}
+              />
             ))}
           </div>
-        </div>
-
-        <div className={styles.carouselDots}>
-          {featuredItems.map((_, index) => (
-            <button
-              key={index}
-              className={`${styles.dot} ${
-                index === currentSlide ? styles.activeDot : ""
-              }`}
-              onClick={() => setCurrentSlide(index)}
-            />
-          ))}
-        </div>
+        )}
       </section>
 
       {/* Categories Section */}
@@ -613,17 +606,31 @@ const LandingPage = () => {
           <h2 className={styles.sectionTitle}>Browse Categories</h2>
         </div>
 
-        <div className={styles.categoriesGrid}>
-          {categories.map((category) => (
-            <div key={category.id} className={styles.categoryCard}>
-              <div className={styles.categoryIcon}>
-                <span className={styles.categoryEmoji}>{category.icon}</span>
+        {loading.categories ? (
+          <div className={styles.loadingContainer}>
+            <FaSpinner className={styles.spinner} />
+            <p>Loading categories...</p>
+          </div>
+        ) : error.categories ? (
+          <div className={styles.errorContainer}>
+            <p>Error: {error.categories}</p>
+            <button onClick={fetchCategories} className={styles.retryBtn}>
+              Retry
+            </button>
+          </div>
+        ) : (
+          <div className={styles.categoriesGrid}>
+            {categories.map((category) => (
+              <div key={category.id} className={styles.categoryCard}>
+                <div className={styles.categoryIcon}>
+                  <span className={styles.categoryEmoji}>{category.icon}</span>
+                </div>
+                <h3 className={styles.categoryName}>{category.name}</h3>
+                <p className={styles.categoryCount}>{category.count}</p>
               </div>
-              <h3 className={styles.categoryName}>{category.name}</h3>
-              <p className={styles.categoryCount}>{category.count}</p>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Product Listings */}
@@ -666,44 +673,72 @@ const LandingPage = () => {
           </div>
         </div>
 
-        <div className={styles.productsGrid}>
-          {filteredProducts.map((product) => (
-            <div key={product.id} className={styles.productCard}>
-              <div className={styles.productImage}>
-                <span className={styles.productEmoji}>{product.image}</span>
-                <button className={styles.favoriteBtn}>
-                  <FaHeart className={styles.heartIcon} />
-                </button>
-              </div>
-              <div className={styles.productInfo}>
-                <h3 className={styles.productName}>{product.name}</h3>
-                <div className={styles.productDetails}>
-                  <span className={styles.productSize}>
-                    Size: {product.size}
-                  </span>
-                  <span className={styles.productCondition}>
-                    {product.condition}
-                  </span>
-                </div>
-                <div className={styles.productMeta}>
-                  <span className={styles.productPoints}>
-                    {product.points} pts
-                  </span>
-                  <span className={styles.productLocation}>
-                    <FaMapMarkerAlt className={styles.locationIcon} />
-                    {product.location}
-                  </span>
-                </div>
-                <div className={styles.productActions}>
-                  <button className={styles.viewBtn}>View Details</button>
-                  <button className={styles.swapRequestBtn}>
-                    Request Swap
+        {loading.products ? (
+          <div className={styles.loadingContainer}>
+            <FaSpinner className={styles.spinner} />
+            <p>Loading products...</p>
+          </div>
+        ) : error.products ? (
+          <div className={styles.errorContainer}>
+            <p>Error: {error.products}</p>
+            <button onClick={fetchProducts} className={styles.retryBtn}>
+              Retry
+            </button>
+          </div>
+        ) : filteredProducts.length === 0 ? (
+          <div className={styles.emptyContainer}>
+            <p>No products available</p>
+          </div>
+        ) : (
+          <div className={styles.productsGrid}>
+            {filteredProducts.map((product) => (
+              <div key={product._id} className={styles.productCard}>
+                <div className={styles.productImage}>
+                  {product.images && product.images.length > 0 ? (
+                    <img 
+                      src={`http://localhost:3000${product.images[0].url}`} 
+                      alt={product.title}
+                      className={styles.productImage}
+                    />
+                  ) : (
+                    <span className={styles.productEmoji}>
+                      {getItemEmoji(product.category)}
+                    </span>
+                  )}
+                  <button className={styles.favoriteBtn}>
+                    <FaHeart className={styles.heartIcon} />
                   </button>
                 </div>
+                <div className={styles.productInfo}>
+                  <h3 className={styles.productName}>{product.title}</h3>
+                  <div className={styles.productDetails}>
+                    <span className={styles.productSize}>
+                      Size: {product.size}
+                    </span>
+                    <span className={styles.productCondition}>
+                      {product.condition}
+                    </span>
+                  </div>
+                  <div className={styles.productMeta}>
+                    <span className={styles.productPoints}>
+                      {product.pointsValue} pts
+                    </span>
+                    <span className={styles.productLocation}>
+                      <FaMapMarkerAlt className={styles.locationIcon} />
+                      {product.location}
+                    </span>
+                  </div>
+                  <div className={styles.productActions}>
+                    <button className={styles.viewBtn}>View Details</button>
+                    <button className={styles.swapRequestBtn}>
+                      Request Swap
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Testimonials & Impact Metrics */}
