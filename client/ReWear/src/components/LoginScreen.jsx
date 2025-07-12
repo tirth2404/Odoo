@@ -97,6 +97,10 @@ export default function Login() {
           Don't have an account? <a href="/register">Register</a>
         </p>
       </form>
+    </div>
+  );
+}
+
     <div className="auth-bg">
       <div className="auth-card">
         <div className="auth-logo">
@@ -135,5 +139,3 @@ export default function Login() {
         </form>
       </div>
     </div>
-  );
-}
