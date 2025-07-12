@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import styles from "./LandingPage.module.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   FaUserCircle,
   FaSearch,
@@ -31,6 +31,8 @@ const LandingPage = () => {
   const categoriesSectionRef = useRef(null);
   const productsSectionRef = useRef(null);
   const carouselSectionRef = useRef(null);
+
+  const navigate = useNavigate();
 
   // Featured items for carousel
   const featuredItems = [
@@ -614,15 +616,45 @@ const LandingPage = () => {
         </div>
 
         <div className={styles.categoriesGrid}>
-          {categories.map((category) => (
-            <div key={category.id} className={styles.categoryCard}>
-              <div className={styles.categoryIcon}>
-                <span className={styles.categoryEmoji}>{category.icon}</span>
+          {categories.map((category) => {
+            let route = "";
+            switch (category.name) {
+              case "Men's Clothing":
+                route = "/mens-wear";
+                break;
+              case "Women's Clothing":
+                route = "/womens-wear";
+                break;
+              case "Kids":
+                route = "/kids-wear";
+                break;
+              case "Accessories":
+                route = "/accessories";
+                break;
+              case "Footwear":
+                route = "/footwear";
+                break;
+              case "Outerwear":
+                route = "/outerwear";
+                break;
+              default:
+                route = "/";
+            }
+            return (
+              <div
+                key={category.id}
+                className={styles.categoryCard}
+                onClick={() => navigate(route)}
+                style={{ cursor: 'pointer' }}
+              >
+                <div className={styles.categoryIcon}>
+                  <span className={styles.categoryEmoji}>{category.icon}</span>
+                </div>
+                <h3 className={styles.categoryName}>{category.name}</h3>
+                <p className={styles.categoryCount}>{category.count}</p>
               </div>
-              <h3 className={styles.categoryName}>{category.name}</h3>
-              <p className={styles.categoryCount}>{category.count}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
