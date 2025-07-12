@@ -7,7 +7,7 @@ import "./AuthScreen.css";
 export default function Login() {
   const [formData, setFormData] = useState({
     email: "",
-    password: ""
+    password: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -15,7 +15,7 @@ export default function Login() {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.id]: e.target.value
+      [e.target.id]: e.target.value,
     });
   };
 
@@ -28,29 +28,29 @@ export default function Login() {
       const response = await fetch("http://localhost:3000/api/auth/login", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
       });
 
       const data = await response.json();
 
       if (data.success) {
         // Check user role and redirect accordingly
-        if (data.data.role === 'admin') {
+        if (data.data.role === "admin") {
           // Store admin token and user data
           localStorage.setItem("adminToken", data.data.token);
           localStorage.setItem("adminUser", JSON.stringify(data.data));
-          
+
           // Redirect to admin dashboard
           window.location.href = "/admin/dashboard";
         } else {
           // Store regular user token and user data
           localStorage.setItem("token", data.data.token);
           localStorage.setItem("user", JSON.stringify(data.data));
-          
-          // Redirect to user dashboard
-          window.location.href = "/userDashboard";
+
+          // Redirect to home page instead of user dashboard
+          window.location.href = "/";
         }
       } else {
         setError(data.message || "Login failed");
@@ -71,9 +71,7 @@ export default function Login() {
         </div>
         <form className="login-form" onSubmit={handleSubmit}>
           <h1 className="auth-title">Login</h1>
-          {error && (
-            <div className="auth-error">{error}</div>
-          )}
+          {error && <div className="auth-error">{error}</div>}
           <label htmlFor="email">Email</label>
           <input
             type="email"

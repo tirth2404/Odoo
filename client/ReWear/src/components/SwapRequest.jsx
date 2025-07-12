@@ -15,6 +15,7 @@ export default function SwapRequest() {
   const [note, setNote] = useState("");
   const [pointsAdjustment, setPointsAdjustment] = useState(0);
   const [userPoints, setUserPoints] = useState(0);
+  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -52,7 +53,7 @@ export default function SwapRequest() {
 
       const userItemsData = await userItemsResponse.json();
       if (userItemsData.success) {
-        setUserItems(userItemsData.data.filter(item => item.status === "approved"));
+        setUserItems(userItemsData.data.filter(item => item.status === "approved" || item.status === "available"));
       }
 
       // Fetch user points
@@ -79,7 +80,10 @@ export default function SwapRequest() {
       alert("Please select an item to offer");
       return;
     }
-
+    if (selectedItem._id === requestedItem._id) {
+      alert("You cannot offer the same item you are requesting.");
+      return;
+    }
     setSubmitting(true);
     try {
       const token = localStorage.getItem("token");
@@ -103,8 +107,8 @@ export default function SwapRequest() {
       const data = await response.json();
 
       if (data.success) {
-        alert("Swap request sent successfully!");
-        navigate("/swaps");
+        setSuccess(true);
+        setTimeout(() => navigate("/swaps"), 1500);
       } else {
         alert("Failed to send swap request: " + data.message);
       }
@@ -153,6 +157,14 @@ export default function SwapRequest() {
     );
   }
 
+  if (success) {
+    return (
+      <div className="swap-container">
+        <div className="success-message">✅ Swap request sent successfully!</div>
+      </div>
+    );
+  }
+
   return (
     <div className="swap-container">
       <header className="swap-header">
@@ -174,6 +186,16 @@ export default function SwapRequest() {
         <div className="requested-item-section">
           <h2>👕 Item You Want</h2>
           <div className="item-card">
+            {requestedItem.images && requestedItem.images.length > 0 ? (
+              <img
+                src={requestedItem.images[0].url}
+                alt={requestedItem.title}
+                className="swap-item-image"
+                style={{ maxWidth: 120, borderRadius: 8, marginBottom: 8 }}
+              />
+            ) : (
+              <div className="swap-item-placeholder">No Image</div>
+            )}
             <div className="item-header">
               <h3>{requestedItem.title}</h3>
               <span className="item-category">{requestedItem.category}</span>
@@ -200,103 +222,99 @@ export default function SwapRequest() {
               </button>
             </div>
           ) : (
-            <div className="items-grid">
-              {userItems.map((item) => (
-                <div 
-                  key={item._id} 
-                  className={`item-card ${selectedItem?._id === item._id ? 'selected' : ''}`}
+            <div className="user-items-grid" style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>
+              {userItems.map(item => (
+                <div
+                  key={item._id}
+                  className={`user-item-card ${selectedItem && selectedItem._id === item._id ? 'selected' : ''}`}
                   onClick={() => setSelectedItem(item)}
+                  style={{
+                    cursor: 'pointer',
+                    border: selectedItem && selectedItem._id === item._id ? '2px solid #4f46e5' : '1px solid #ccc',
+                    borderRadius: 8,
+                    padding: 8,
+                    margin: 4,
+                    background: selectedItem && selectedItem._id === item._id ? '#f0f4ff' : '#fff',
+                    minWidth: 120,
+                    maxWidth: 160,
+                    textAlign: 'center',
+                  }}
                 >
-                  <div className="item-header">
-                    <h3>{item.title}</h3>
-                    <span className="item-category">{item.category}</span>
-                  </div>
-                  <div className="item-details">
-                    <p><strong>Description:</strong> {item.description}</p>
-                    <p><strong>Brand:</strong> {item.brand || 'N/A'}</p>
-                    <p><strong>Size:</strong> {item.size}</p>
-                    <p><strong>Condition:</strong> {item.condition}</p>
-                    <p><strong>Points Value:</strong> 💎 {item.pointsValue}</p>
-                  </div>
-                  {selectedItem?._id === item._id && (
-                    <div className="selection-indicator">✅ Selected</div>
+                  {item.images && item.images.length > 0 ? (
+                    <img
+                      src={item.images[0].url}
+                      alt={item.title}
+                      className="swap-item-image"
+                      style={{ maxWidth: 80, borderRadius: 6, marginBottom: 4 }}
+                    />
+                  ) : (
+                    <div className="swap-item-placeholder">No Image</div>
                   )}
+                  <div><strong>{item.title}</strong></div>
+                  <div>Points: {item.pointsValue}</div>
+                  <div>Size: {item.size}</div>
                 </div>
               ))}
             </div>
           )}
         </div>
 
-        {/* Points Exchange */}
+        {/* Points Adjustment */}
         {selectedItem && (
-          <div className="points-exchange-section">
-            <h2>💰 Points Exchange</h2>
-            <div className="points-breakdown">
-              <div className="points-item">
-                <span>Your item value:</span>
-                <span className="points-value">💎 {selectedItem.pointsValue}</span>
-              </div>
-              <div className="points-item">
-                <span>Requested item value:</span>
-                <span className="points-value">💎 {requestedItem.pointsValue}</span>
-              </div>
-              <div className="points-difference">
-                <span>Difference:</span>
-                <span className={`points-value ${calculatePointsDifference() > 0 ? 'negative' : 'positive'}`}>
-                  {calculatePointsDifference() > 0 ? '-' : '+'}💎 {Math.abs(calculatePointsDifference())}
-                </span>
-              </div>
+          <div className="points-section" style={{ marginTop: 24 }}>
+            <h2>💎 Points Adjustment</h2>
+            <div style={{ marginBottom: 8 }}>{getPointsMessage()}</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <FaCoins />
+              <input
+                type="number"
+                value={pointsAdjustment}
+                onChange={e => setPointsAdjustment(Number(e.target.value))}
+                min={-userPoints}
+                max={userPoints}
+                style={{ width: 80, padding: 4, borderRadius: 4, border: '1px solid #ccc' }}
+                disabled={submitting}
+              />
+              <span style={{ color: '#6c757d', fontSize: 12 }}>
+                (You have {userPoints} points)
+              </span>
             </div>
-            <p className="points-message">{getPointsMessage()}</p>
-            
-            {calculatePointsDifference() > 0 && (
-              <div className="points-adjustment">
-                <label>Additional points to offer:</label>
-                <input
-                  type="number"
-                  min="0"
-                  max={userPoints}
-                  value={pointsAdjustment}
-                  onChange={(e) => setPointsAdjustment(parseInt(e.target.value) || 0)}
-                  className="points-input"
-                />
-                <span className="points-available">Available: 💎 {userPoints}</span>
-              </div>
-            )}
           </div>
         )}
 
-        {/* Note */}
-        <div className="note-section">
-          <h2>📝 Add a Note (Optional)</h2>
+        {/* Note Field */}
+        <div className="note-section" style={{ marginTop: 24 }}>
+          <h2>📝 Add a Note (optional)</h2>
           <textarea
             value={note}
-            onChange={(e) => setNote(e.target.value)}
-            placeholder="Add a personal message to the item owner..."
-            maxLength={200}
-            className="note-input"
+            onChange={e => setNote(e.target.value)}
+            rows={3}
+            style={{ width: '100%', borderRadius: 6, border: '1px solid #ccc', padding: 8 }}
+            placeholder="Add a message for the recipient..."
+            disabled={submitting}
           />
-          <span className="char-count">{note.length}/200</span>
         </div>
 
         {/* Submit Button */}
-        <div className="submit-section">
-          <button 
+        <div style={{ marginTop: 32, textAlign: 'center' }}>
+          <button
+            className="swap-submit-btn"
             onClick={handleSubmit}
-            disabled={!selectedItem || submitting}
-            className="submit-btn"
+            disabled={submitting || !selectedItem}
+            style={{
+              background: '#4f46e5',
+              color: '#fff',
+              padding: '12px 32px',
+              border: 'none',
+              borderRadius: 8,
+              fontSize: 18,
+              fontWeight: 600,
+              cursor: submitting || !selectedItem ? 'not-allowed' : 'pointer',
+              opacity: submitting || !selectedItem ? 0.6 : 1,
+              boxShadow: '0 2px 8px rgba(79,70,229,0.08)'
+            }}
           >
-            {submitting ? (
-              <>
-                <div className="spinner"></div>
-                Sending Request...
-              </>
-            ) : (
-              <>
-                <FaPaperPlane />
-                Send Swap Request
-              </>
-            )}
+            {submitting ? 'Sending...' : <><FaPaperPlane style={{ marginRight: 8 }} /> Send Swap Request</>}
           </button>
         </div>
       </div>
