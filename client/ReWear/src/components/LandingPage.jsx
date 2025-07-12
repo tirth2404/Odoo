@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import styles from "./LandingPage.module.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   FaUserCircle,
   FaSearch,
@@ -48,8 +48,71 @@ const LandingPage = () => {
   const productsSectionRef = useRef(null);
   const carouselSectionRef = useRef(null);
 
+<<<<<<< HEAD
+  const navigate = useNavigate();
+
+  // Featured items for carousel
+  const featuredItems = [
+    {
+      id: 1,
+      name: "Vintage Denim Jacket",
+      category: "Outerwear",
+      size: "M",
+      condition: "Excellent",
+      points: 150,
+      image: "👕",
+      type: "trending",
+      location: "New York",
+    },
+    {
+      id: 2,
+      name: "Summer Floral Dress",
+      category: "Dresses",
+      size: "S",
+      condition: "Good",
+      points: 120,
+      image: "👗",
+      type: "popular",
+      location: "Los Angeles",
+    },
+    {
+      id: 3,
+      name: "Classic White Sneakers",
+      category: "Footwear",
+      size: "8",
+      condition: "Like New",
+      points: 200,
+      image: "👟",
+      type: "recent",
+      location: "Chicago",
+    },
+    {
+      id: 4,
+      name: "Leather Crossbody Bag",
+      category: "Accessories",
+      size: "One Size",
+      condition: "Excellent",
+      points: 180,
+      image: "👜",
+      type: "trending",
+      location: "Miami",
+    },
+    {
+      id: 5,
+      name: "Cozy Winter Sweater",
+      category: "Sweaters",
+      size: "L",
+      condition: "Good",
+      points: 100,
+      image: "🧥",
+      type: "popular",
+      location: "Seattle",
+    },
+  ];
+=======
   // API base URL
   const API_BASE_URL = 'http://localhost:3000/api';
+>>>>>>> a9674683bae1b1715c066093074c97cccd08b447
 
   // Fetch featured items
   const fetchFeaturedItems = async () => {
@@ -667,6 +730,40 @@ const LandingPage = () => {
           <h2 className={styles.sectionTitle}>Browse Categories</h2>
         </div>
 
+<<<<<<< HEAD
+        <div className={styles.categoriesGrid}>
+          {categories.map((category) => {
+            let route = "";
+            switch (category.name) {
+              case "Men's Clothing":
+                route = "/mens-wear";
+                break;
+              case "Women's Clothing":
+                route = "/womens-wear";
+                break;
+              case "Kids":
+                route = "/kids-wear";
+                break;
+              case "Accessories":
+                route = "/accessories";
+                break;
+              case "Footwear":
+                route = "/footwear";
+                break;
+              case "Outerwear":
+                route = "/outerwear";
+                break;
+              default:
+                route = "/";
+            }
+            return (
+              <div
+                key={category.id}
+                className={styles.categoryCard}
+                onClick={() => navigate(route)}
+                style={{ cursor: 'pointer' }}
+              >
+=======
         {loading.categories ? (
           <div className={styles.loadingContainer}>
             <FaSpinner className={styles.spinner} />
@@ -683,15 +780,22 @@ const LandingPage = () => {
           <div className={styles.categoriesGrid}>
             {categories.map((category) => (
               <div key={category.id} className={styles.categoryCard}>
+>>>>>>> a9674683bae1b1715c066093074c97cccd08b447
                 <div className={styles.categoryIcon}>
                   <span className={styles.categoryEmoji}>{category.icon}</span>
                 </div>
                 <h3 className={styles.categoryName}>{category.name}</h3>
                 <p className={styles.categoryCount}>{category.count}</p>
               </div>
+<<<<<<< HEAD
+            );
+          })}
+        </div>
+=======
             ))}
           </div>
         )}
+>>>>>>> a9674683bae1b1715c066093074c97cccd08b447
       </section>
 
       {/* Product Listings */}
