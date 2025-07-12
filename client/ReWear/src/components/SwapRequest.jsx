@@ -188,7 +188,7 @@ export default function SwapRequest() {
           <div className="item-card">
             {requestedItem.images && requestedItem.images.length > 0 ? (
               <img
-                src={`http://localhost:3000${requestedItem.images[0].url}`}
+                src={requestedItem.images[0].url}
                 alt={requestedItem.title}
                 className="swap-item-image"
                 style={{ maxWidth: 120, borderRadius: 8, marginBottom: 8 }}
@@ -242,7 +242,7 @@ export default function SwapRequest() {
                 >
                   {item.images && item.images.length > 0 ? (
                     <img
-                      src={`http://localhost:3000${item.images[0].url}`}
+                      src={item.images[0].url}
                       alt={item.title}
                       className="swap-item-image"
                       style={{ maxWidth: 80, borderRadius: 6, marginBottom: 4 }}

@@ -594,9 +594,9 @@ const LandingPage = () => {
                     <div className={styles.itemImage}>
                       {item.images && item.images.length > 0 ? (
                         <>
-                          <img 
-                            src={`http://localhost:3000${item.images[0].url}`} 
-                            alt={item.title}
+                                                  <img 
+                          src={item.images[0].url} 
+                          alt={item.title}
                             className={styles.itemImage}
                             onError={(e) => {
                               console.error('Image failed to load:', e.target.src);
@@ -758,7 +758,7 @@ const LandingPage = () => {
                   {product.images && product.images.length > 0 ? (
                     <>
                       <img 
-                        src={`http://localhost:3000${product.images[0].url}`} 
+                        src={product.images[0].url} 
                         alt={product.title}
                         className={styles.productImage}
                         onError={(e) => {

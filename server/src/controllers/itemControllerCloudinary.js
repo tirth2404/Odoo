@@ -1,7 +1,7 @@
 const Item = require('../models/Item');
-const { processImages } = require('../utils/imageUtils');
+const { uploadImage, deleteImage } = require('../utils/cloudinary');
 
-// @desc    Create new item
+// @desc    Create new item with Cloudinary
 // @route   POST /api/items
 // @access  Private
 exports.createItem = async (req, res) => {
@@ -19,14 +19,14 @@ exports.createItem = async (req, res) => {
       tagsArray = [];
     }
 
-    // Handle images
-    const images = req.files ? req.files.map(file => ({
-      url: `/uploads/${file.filename}`,
-      public_id: file.filename
-    })) : [];
+    // Handle images with Cloudinary
+    let images = [];
+    if (req.files && req.files.length > 0) {
+      const uploadPromises = req.files.map(file => uploadImage(file));
+      images = await Promise.all(uploadPromises);
+    }
 
-    console.log('Uploaded files:', req.files);
-    console.log('Generated image URLs:', images);
+    console.log('Uploaded files to Cloudinary:', images);
 
     const item = await Item.create({
       title,
@@ -47,15 +47,9 @@ exports.createItem = async (req, res) => {
       owner: req.user._id
     });
 
-    // Process images to ensure URLs are absolute
-    const processedItem = {
-      ...item.toObject(),
-      images: processImages(item.images)
-    };
-
     res.status(201).json({
       success: true,
-      data: processedItem
+      data: item
     });
   } catch (error) {
     res.status(500).json({
@@ -154,18 +148,12 @@ exports.getItems = async (req, res) => {
 
     const items = [...featuredItems, ...regularItems];
 
-    // Process images for all items
-    const processedItems = items.map(item => ({
-      ...item.toObject(),
-      images: processImages(item.images)
-    }));
-
     // Get total count for pagination
     const total = await Item.countDocuments(filter);
 
     res.json({
       success: true,
-      data: processedItems,
+      data: items,
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),
@@ -195,15 +183,9 @@ exports.getFeaturedItems = async (req, res) => {
     .sort({ featuredAt: -1 })
     .limit(10);
 
-    // Process images for featured items
-    const processedItems = items.map(item => ({
-      ...item.toObject(),
-      images: processImages(item.images)
-    }));
-
     res.json({
       success: true,
-      data: processedItems
+      data: items
     });
   } catch (error) {
     res.status(500).json({
@@ -258,15 +240,9 @@ exports.getItem = async (req, res) => {
     // Increment views
     await item.incrementViews();
 
-    // Process images
-    const processedItem = {
-      ...item.toObject(),
-      images: processImages(item.images)
-    };
-
     res.json({
       success: true,
-      data: processedItem
+      data: item
     });
   } catch (error) {
     res.status(500).json({
@@ -336,6 +312,14 @@ exports.deleteItem = async (req, res) => {
         success: false,
         message: 'Not authorized to delete this item'
       });
+    }
+
+    // Delete images from Cloudinary
+    if (item.images && item.images.length > 0) {
+      const deletePromises = item.images.map(image => 
+        deleteImage(image.public_id)
+      );
+      await Promise.all(deletePromises);
     }
 
     await item.remove();

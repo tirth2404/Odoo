@@ -46,6 +46,14 @@ app.use('/api/swaps', swapRoutes);
 // Serve static files from uploads directory
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
+// Add CORS headers for image serving
+app.use('/uploads', (req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  next();
+});
+
 // Test route
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'API is running!' });
