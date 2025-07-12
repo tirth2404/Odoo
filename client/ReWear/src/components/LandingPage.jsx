@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styles from "./LandingPage.module.css";
 import { Link } from "react-router-dom";
 import {
@@ -25,6 +25,12 @@ const LandingPage = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showSearchResults, setShowSearchResults] = useState(false);
+  const [activeFilter, setActiveFilter] = useState("All");
+
+  // Refs for sections
+  const categoriesSectionRef = useRef(null);
+  const productsSectionRef = useRef(null);
+  const carouselSectionRef = useRef(null);
 
   // Featured items for carousel
   const featuredItems = [
@@ -105,6 +111,7 @@ const LandingPage = () => {
       points: 120,
       image: "👖",
       location: "New York",
+      category: "Men's Clothing",
     },
     {
       id: 2,
@@ -114,6 +121,7 @@ const LandingPage = () => {
       points: 90,
       image: "👗",
       location: "Los Angeles",
+      category: "Women's Clothing",
     },
     {
       id: 3,
@@ -123,6 +131,7 @@ const LandingPage = () => {
       points: 250,
       image: "🧥",
       location: "Chicago",
+      category: "Outerwear",
     },
     {
       id: 4,
@@ -132,6 +141,7 @@ const LandingPage = () => {
       points: 180,
       image: "👟",
       location: "Miami",
+      category: "Footwear",
     },
     {
       id: 5,
@@ -141,6 +151,7 @@ const LandingPage = () => {
       points: 75,
       image: "👚",
       location: "Seattle",
+      category: "Women's Clothing",
     },
     {
       id: 6,
@@ -150,6 +161,7 @@ const LandingPage = () => {
       points: 300,
       image: "👜",
       location: "Boston",
+      category: "Accessories",
     },
     {
       id: 7,
@@ -159,6 +171,7 @@ const LandingPage = () => {
       points: 60,
       image: "👕",
       location: "Austin",
+      category: "Men's Clothing",
     },
     {
       id: 8,
@@ -168,6 +181,7 @@ const LandingPage = () => {
       points: 220,
       image: "👢",
       location: "Denver",
+      category: "Footwear",
     },
   ];
 
@@ -192,6 +206,40 @@ const LandingPage = () => {
       avatar: "👨‍🦱",
     },
   ];
+
+  // Smooth scroll to section
+  const scrollToSection = (sectionRef, offset = 100) => {
+    if (sectionRef.current) {
+      const elementPosition = sectionRef.current.offsetTop;
+      const offsetPosition = elementPosition - offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  // Filter products based on active filter
+  const getFilteredProducts = () => {
+    if (activeFilter === "All") return products;
+
+    return products.filter((product) => {
+      switch (activeFilter) {
+        case "Trending":
+          return featuredItems.some((item) => item.name === product.name);
+        case "New":
+          return (
+            product.condition === "Like New" ||
+            product.condition === "Excellent"
+          );
+        case "Popular":
+          return product.points > 150;
+        default:
+          return product.category === activeFilter;
+      }
+    });
+  };
 
   // Search functionality
   const performSearch = (query) => {
@@ -268,7 +316,33 @@ const LandingPage = () => {
     console.log("Selected result:", result);
     setSearchQuery(result.name);
     setShowSearchResults(false);
-    // Here you would typically navigate to the item or filter the view
+
+    // Navigate to appropriate section based on result type
+    if (result.type === "category") {
+      // Scroll to categories section and highlight the category
+      scrollToSection(categoriesSectionRef);
+      // You could add additional logic to highlight the specific category
+    } else if (result.type === "product") {
+      // Scroll to products section and filter by category if applicable
+      scrollToSection(productsSectionRef);
+      if (result.category) {
+        setActiveFilter(result.category);
+      }
+    } else if (result.type === "featured") {
+      // Scroll to carousel section
+      scrollToSection(carouselSectionRef);
+    }
+
+    // Add a visual feedback
+    setTimeout(() => {
+      // You could add a highlight effect here
+      console.log(`Navigated to ${result.type} section for: ${result.name}`);
+    }, 500);
+  };
+
+  // Handle filter button clicks
+  const handleFilterClick = (filter) => {
+    setActiveFilter(filter);
   };
 
   // Close search results when clicking outside
@@ -302,6 +376,8 @@ const LandingPage = () => {
       (prev) => (prev - 1 + featuredItems.length) % featuredItems.length
     );
   };
+
+  const filteredProducts = getFilteredProducts();
 
   return (
     <div className={styles.landingPage}>
@@ -455,7 +531,7 @@ const LandingPage = () => {
       </section>
 
       {/* Featured Items Carousel */}
-      <section className={styles.carouselSection}>
+      <section ref={carouselSectionRef} className={styles.carouselSection}>
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>Featured Items</h2>
           <div className={styles.carouselControls}>
@@ -532,7 +608,7 @@ const LandingPage = () => {
       </section>
 
       {/* Categories Section */}
-      <section className={styles.categoriesSection}>
+      <section ref={categoriesSectionRef} className={styles.categoriesSection}>
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>Browse Categories</h2>
         </div>
@@ -551,19 +627,47 @@ const LandingPage = () => {
       </section>
 
       {/* Product Listings */}
-      <section className={styles.productsSection}>
+      <section ref={productsSectionRef} className={styles.productsSection}>
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>Available Items</h2>
           <div className={styles.filterButtons}>
-            <button className={styles.filterBtn}>All</button>
-            <button className={styles.filterBtn}>Trending</button>
-            <button className={styles.filterBtn}>New</button>
-            <button className={styles.filterBtn}>Popular</button>
+            <button
+              className={`${styles.filterBtn} ${
+                activeFilter === "All" ? styles.active : ""
+              }`}
+              onClick={() => handleFilterClick("All")}
+            >
+              All
+            </button>
+            <button
+              className={`${styles.filterBtn} ${
+                activeFilter === "Trending" ? styles.active : ""
+              }`}
+              onClick={() => handleFilterClick("Trending")}
+            >
+              Trending
+            </button>
+            <button
+              className={`${styles.filterBtn} ${
+                activeFilter === "New" ? styles.active : ""
+              }`}
+              onClick={() => handleFilterClick("New")}
+            >
+              New
+            </button>
+            <button
+              className={`${styles.filterBtn} ${
+                activeFilter === "Popular" ? styles.active : ""
+              }`}
+              onClick={() => handleFilterClick("Popular")}
+            >
+              Popular
+            </button>
           </div>
         </div>
 
         <div className={styles.productsGrid}>
-          {products.map((product) => (
+          {filteredProducts.map((product) => (
             <div key={product.id} className={styles.productCard}>
               <div className={styles.productImage}>
                 <span className={styles.productEmoji}>{product.image}</span>
