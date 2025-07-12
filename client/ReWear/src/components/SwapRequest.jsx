@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { FaArrowLeft, FaExchangeAlt, FaCoins, FaPaperPlane } from "react-icons/fa";
-import "../index.css";
+import { FaArrowLeft, FaExchangeAlt, FaCoins, FaPaperPlane, FaTshirt, FaUser, FaMapMarkerAlt } from "react-icons/fa";
+import styles from "./SwapRequest.module.css";
 
 export default function SwapRequest() {
   const { itemId } = useParams();
@@ -53,20 +53,16 @@ export default function SwapRequest() {
 
       const userItemsData = await userItemsResponse.json();
       if (userItemsData.success) {
-        setUserItems(userItemsData.data.filter(item => item.status === "approved" || item.status === "available"));
+        // Filter items that are available for swap (either approved or available status)
+        setUserItems(userItemsData.data.filter(item => 
+          (item.status === "available" || item.status === "approved") && 
+          item._id !== itemId // Don't allow swapping the same item
+        ));
       }
 
-      // Fetch user points
-      const userResponse = await fetch("http://localhost:3000/api/auth/me", {
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
-      });
-
-      const userData = await userResponse.json();
-      if (userData.success) {
-        setUserPoints(userData.data.points || 0);
-      }
+      // Get user data from localStorage
+      const userData = JSON.parse(localStorage.getItem("user") || "{}");
+      setUserPoints(userData.points || 0);
 
     } catch (err) {
       setError("Network error. Please try again.");
@@ -137,8 +133,8 @@ export default function SwapRequest() {
 
   if (loading) {
     return (
-      <div className="swap-container">
-        <div className="loading">
+      <div className={styles.swapContainer}>
+        <div className={styles.loading}>
           <div style={{ fontSize: '24px', marginBottom: '10px' }}>🔄</div>
           Loading swap request form...
         </div>
@@ -148,10 +144,10 @@ export default function SwapRequest() {
 
   if (error || !requestedItem) {
     return (
-      <div className="swap-container">
-        <div className="error-message">❌ {error || "Item not found"}</div>
-        <button onClick={() => navigate(-1)} className="back-btn">
-          ← Go Back
+      <div className={styles.swapContainer}>
+        <div className={styles.errorMessage}>❌ {error || "Item not found"}</div>
+        <button onClick={() => navigate(-1)} className={styles.backBtn}>
+          <FaArrowLeft /> Go Back
         </button>
       </div>
     );
@@ -159,96 +155,85 @@ export default function SwapRequest() {
 
   if (success) {
     return (
-      <div className="swap-container">
-        <div className="success-message">✅ Swap request sent successfully!</div>
+      <div className={styles.swapContainer}>
+        <div className={styles.successMessage}>✅ Swap request sent successfully!</div>
       </div>
     );
   }
 
   return (
-    <div className="swap-container">
-      <header className="swap-header">
-        <div>
+    <div className={styles.swapContainer}>
+      <header className={styles.swapHeader}>
+        <div className={styles.headerTitle}>
           <h1>🔄 Request Swap</h1>
-          <p style={{ margin: '5px 0 0 0', color: '#6c757d', fontSize: '16px' }}>
-            Propose a clothing exchange
-          </p>
+          <p>Propose a clothing exchange</p>
         </div>
-        <div className="header-actions">
-          <button onClick={() => navigate(-1)} className="back-btn">
+        <div className={styles.headerActions}>
+          <button onClick={() => navigate(-1)} className={styles.backBtn}>
             <FaArrowLeft /> Go Back
           </button>
         </div>
       </header>
 
-      <div className="swap-content">
+      <div className={styles.swapContent}>
         {/* Requested Item */}
-        <div className="requested-item-section">
-          <h2>👕 Item You Want</h2>
-          <div className="item-card">
+        <div className={styles.requestedItemSection}>
+          <h2 className={styles.sectionTitle}>
+            <FaTshirt /> Item You Want
+          </h2>
+          <div className={styles.itemCard}>
             {requestedItem.images && requestedItem.images.length > 0 ? (
               <img
                 src={requestedItem.images[0].url}
                 alt={requestedItem.title}
-                className="swap-item-image"
-                style={{ maxWidth: 120, borderRadius: 8, marginBottom: 8 }}
+                className={styles.swapItemImage}
               />
             ) : (
-              <div className="swap-item-placeholder">No Image</div>
+              <div className={styles.swapItemPlaceholder}>No Image</div>
             )}
-            <div className="item-header">
-              <h3>{requestedItem.title}</h3>
-              <span className="item-category">{requestedItem.category}</span>
+            <div className={styles.itemHeader}>
+              <h3 className={styles.itemTitle}>{requestedItem.title}</h3>
+              <span className={styles.itemCategory}>{requestedItem.category}</span>
             </div>
-            <div className="item-details">
+            <div className={styles.itemDetails}>
               <p><strong>Description:</strong> {requestedItem.description}</p>
               <p><strong>Brand:</strong> {requestedItem.brand || 'N/A'}</p>
               <p><strong>Size:</strong> {requestedItem.size}</p>
               <p><strong>Condition:</strong> {requestedItem.condition}</p>
               <p><strong>Points Value:</strong> 💎 {requestedItem.pointsValue}</p>
-              <p><strong>Owner:</strong> {requestedItem.owner?.name || 'Unknown'}</p>
+              <p><strong>Owner:</strong> <FaUser /> {requestedItem.owner?.name || 'Unknown'}</p>
+              <p><strong>Location:</strong> <FaMapMarkerAlt /> {requestedItem.location || 'Not specified'}</p>
             </div>
           </div>
         </div>
 
         {/* Item Selection */}
-        <div className="item-selection-section">
-          <h2>👕 Select Your Item to Offer</h2>
+        <div className={styles.itemSelectionSection}>
+          <h2 className={styles.sectionTitle}>
+            <FaTshirt /> Select Your Item to Offer
+          </h2>
           {userItems.length === 0 ? (
-            <div className="no-items">
+            <div className={styles.noItems}>
               <p>You don't have any items available for swap.</p>
-              <button onClick={() => navigate("/userDashboard")} className="add-item-btn">
+              <button onClick={() => navigate("/userDashboard")} className={styles.addItemBtn}>
                 Add New Item
               </button>
             </div>
           ) : (
-            <div className="user-items-grid" style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>
+            <div className={styles.userItemsGrid}>
               {userItems.map(item => (
                 <div
                   key={item._id}
-                  className={`user-item-card ${selectedItem && selectedItem._id === item._id ? 'selected' : ''}`}
+                  className={`${styles.userItemCard} ${selectedItem && selectedItem._id === item._id ? styles.selected : ''}`}
                   onClick={() => setSelectedItem(item)}
-                  style={{
-                    cursor: 'pointer',
-                    border: selectedItem && selectedItem._id === item._id ? '2px solid #4f46e5' : '1px solid #ccc',
-                    borderRadius: 8,
-                    padding: 8,
-                    margin: 4,
-                    background: selectedItem && selectedItem._id === item._id ? '#f0f4ff' : '#fff',
-                    minWidth: 120,
-                    maxWidth: 160,
-                    textAlign: 'center',
-                  }}
                 >
                   {item.images && item.images.length > 0 ? (
                     <img
                       src={item.images[0].url}
                       alt={item.title}
-                      className="swap-item-image"
-                      style={{ maxWidth: 80, borderRadius: 6, marginBottom: 4 }}
                     />
                   ) : (
-                    <div className="swap-item-placeholder">No Image</div>
+                    <div className={styles.swapItemPlaceholder}>No Image</div>
                   )}
                   <div><strong>{item.title}</strong></div>
                   <div>Points: {item.pointsValue}</div>
@@ -261,10 +246,12 @@ export default function SwapRequest() {
 
         {/* Points Adjustment */}
         {selectedItem && (
-          <div className="points-section" style={{ marginTop: 24 }}>
-            <h2>💎 Points Adjustment</h2>
-            <div style={{ marginBottom: 8 }}>{getPointsMessage()}</div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div className={styles.pointsSection}>
+            <h2 className={styles.sectionTitle}>
+              <FaCoins /> Points Adjustment
+            </h2>
+            <div style={{ marginBottom: '1rem', color: '#d0d0d0' }}>{getPointsMessage()}</div>
+            <div className={styles.pointsAdjustment}>
               <FaCoins />
               <input
                 type="number"
@@ -272,10 +259,10 @@ export default function SwapRequest() {
                 onChange={e => setPointsAdjustment(Number(e.target.value))}
                 min={-userPoints}
                 max={userPoints}
-                style={{ width: 80, padding: 4, borderRadius: 4, border: '1px solid #ccc' }}
+                className={styles.pointsInput}
                 disabled={submitting}
               />
-              <span style={{ color: '#6c757d', fontSize: 12 }}>
+              <span className={styles.pointsInfo}>
                 (You have {userPoints} points)
               </span>
             </div>
@@ -283,38 +270,26 @@ export default function SwapRequest() {
         )}
 
         {/* Note Field */}
-        <div className="note-section" style={{ marginTop: 24 }}>
-          <h2>📝 Add a Note (optional)</h2>
+        <div className={styles.noteSection}>
+          <h2 className={styles.sectionTitle}>📝 Add a Note (optional)</h2>
           <textarea
             value={note}
             onChange={e => setNote(e.target.value)}
             rows={3}
-            style={{ width: '100%', borderRadius: 6, border: '1px solid #ccc', padding: 8 }}
+            className={styles.noteTextarea}
             placeholder="Add a message for the recipient..."
             disabled={submitting}
           />
         </div>
 
         {/* Submit Button */}
-        <div style={{ marginTop: 32, textAlign: 'center' }}>
+        <div className={styles.submitSection}>
           <button
-            className="swap-submit-btn"
+            className={styles.swapSubmitBtn}
             onClick={handleSubmit}
             disabled={submitting || !selectedItem}
-            style={{
-              background: '#4f46e5',
-              color: '#fff',
-              padding: '12px 32px',
-              border: 'none',
-              borderRadius: 8,
-              fontSize: 18,
-              fontWeight: 600,
-              cursor: submitting || !selectedItem ? 'not-allowed' : 'pointer',
-              opacity: submitting || !selectedItem ? 0.6 : 1,
-              boxShadow: '0 2px 8px rgba(79,70,229,0.08)'
-            }}
           >
-            {submitting ? 'Sending...' : <><FaPaperPlane style={{ marginRight: 8 }} /> Send Swap Request</>}
+            {submitting ? 'Sending...' : <><FaPaperPlane /> Send Swap Request</>}
           </button>
         </div>
       </div>
