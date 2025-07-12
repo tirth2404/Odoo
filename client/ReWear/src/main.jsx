@@ -12,6 +12,10 @@ import AdminItems from "./components/admin/AdminItems.jsx";
 import AdminUsers from "./components/admin/AdminUsers.jsx";
 import AdminFeatured from "./components/admin/AdminFeatured.jsx";
 import AdminAnalytics from "./components/admin/AdminAnalytics.jsx";
+import SwapDashboard from "./components/SwapDashboard.jsx";
+import SwapDetail from "./components/SwapDetail.jsx";
+import SwapRequest from "./components/SwapRequest.jsx";
+import AddItem from "./components/AddItem.jsx";
 
 const router = createBrowserRouter([
   {
@@ -29,6 +33,10 @@ const router = createBrowserRouter([
       { path: "admin/users", element: <AdminUsers /> },
       { path: "admin/featured", element: <AdminFeatured /> },
       { path: "admin/analytics", element: <AdminAnalytics /> },
+      { path: "swaps", element: <SwapDashboard /> },
+      { path: "swaps/:swapId", element: <SwapDetail /> },
+      { path: "swap-request/:itemId", element: <SwapRequest /> },
+      { path: "add-item", element: <AddItem /> },
     ],
   },
 ]);

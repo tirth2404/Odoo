@@ -6,21 +6,23 @@ const Item = require('../models/Item');
 exports.createItem = async (req, res) => {
   try {
     const {
-      title,
-      description,
-      category,
-      subcategory,
-      type,
-      size,
-      condition,
-      brand,
-      color,
-      material,
-      season,
-      tags,
-      pointsValue,
-      location
+      title, description, category, subcategory, type, size, condition,
+      brand, color, material, season, tags, pointsValue, location
     } = req.body;
+
+    // Parse tags if sent as JSON string
+    let tagsArray = [];
+    try {
+      tagsArray = typeof tags === 'string' ? JSON.parse(tags) : [];
+    } catch {
+      tagsArray = [];
+    }
+
+    // Handle images
+    const images = req.files ? req.files.map(file => ({
+      url: `/uploads/${file.filename}`,
+      public_id: file.filename
+    })) : [];
 
     const item = await Item.create({
       title,
@@ -34,9 +36,10 @@ exports.createItem = async (req, res) => {
       color,
       material,
       season,
-      tags: tags ? tags.split(',').map(tag => tag.trim()) : [],
+      tags: tagsArray,
       pointsValue,
       location,
+      images,
       owner: req.user._id
     });
 
