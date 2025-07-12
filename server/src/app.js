@@ -77,7 +77,7 @@ app.get('/api/test-images', (req, res) => {
       imageFiles: imageFiles.map(file => ({
         filename: file,
         url: `/uploads/${file}`,
-        fullUrl: `http://localhost:3000/uploads/${file}`
+        fullUrl: `Cloudinary URL (check dashboard)`
       }))
     });
   } catch (error) {
