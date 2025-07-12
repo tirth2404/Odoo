@@ -152,6 +152,16 @@ const LandingPage = () => {
     fetchFeaturedItems();
     fetchProducts();
     fetchCategories();
+    
+    // Debug: Test image serving
+    fetch('http://localhost:3000/api/test-images')
+      .then(res => res.json())
+      .then(data => {
+        console.log('Image test results:', data);
+      })
+      .catch(err => {
+        console.error('Image test failed:', err);
+      });
   }, []);
 
   // Testimonials (keeping static for now)
@@ -542,11 +552,21 @@ const LandingPage = () => {
                   <div className={styles.featuredCard}>
                     <div className={styles.itemImage}>
                       {item.images && item.images.length > 0 ? (
-                        <img 
-                          src={`http://localhost:3000${item.images[0].url}`} 
-                          alt={item.title}
-                          className={styles.itemImage}
-                        />
+                        <>
+                          <img 
+                            src={`http://localhost:3000${item.images[0].url}`} 
+                            alt={item.title}
+                            className={styles.itemImage}
+                            onError={(e) => {
+                              console.error('Image failed to load:', e.target.src);
+                              e.target.style.display = 'none';
+                              e.target.nextSibling.style.display = 'block';
+                            }}
+                          />
+                          <span className={styles.itemEmoji} style={{ display: 'none' }}>
+                            {getItemEmoji(item.category)}
+                          </span>
+                        </>
                       ) : (
                         <span className={styles.itemEmoji}>
                           {getItemEmoji(item.category)}
@@ -695,11 +715,21 @@ const LandingPage = () => {
               <div key={product._id} className={styles.productCard}>
                 <div className={styles.productImage}>
                   {product.images && product.images.length > 0 ? (
-                    <img 
-                      src={`http://localhost:3000${product.images[0].url}`} 
-                      alt={product.title}
-                      className={styles.productImage}
-                    />
+                    <>
+                      <img 
+                        src={`http://localhost:3000${product.images[0].url}`} 
+                        alt={product.title}
+                        className={styles.productImage}
+                        onError={(e) => {
+                          console.error('Product image failed to load:', e.target.src);
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'block';
+                        }}
+                      />
+                      <span className={styles.productEmoji} style={{ display: 'none' }}>
+                        {getItemEmoji(product.category)}
+                      </span>
+                    </>
                   ) : (
                     <span className={styles.productEmoji}>
                       {getItemEmoji(product.category)}

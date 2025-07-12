@@ -24,6 +24,9 @@ exports.createItem = async (req, res) => {
       public_id: file.filename
     })) : [];
 
+    console.log('Uploaded files:', req.files);
+    console.log('Generated image URLs:', images);
+
     const item = await Item.create({
       title,
       description,
