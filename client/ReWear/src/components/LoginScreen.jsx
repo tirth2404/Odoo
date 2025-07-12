@@ -63,44 +63,6 @@ export default function Login() {
   };
 
   return (
-    <div className="login-container">
-      <form className="login-form" onSubmit={handleSubmit}>
-        <h1>Login</h1>
-        
-        {error && <div className="error-message">{error}</div>}
-        
-        <label htmlFor="email">Email</label>
-        <input
-          type="email"
-          id="email"
-          placeholder="you@example.com"
-          value={formData.email}
-          onChange={handleChange}
-          required
-        />
-        
-        <label htmlFor="password">Password</label>
-        <input
-          type="password"
-          id="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          required
-        />
-        
-        <button type="submit" disabled={loading}>
-          {loading ? "Signing In..." : "Sign In"}
-        </button>
-        
-        <p className="login-link">
-          Don't have an account? <a href="/register">Register</a>
-        </p>
-      </form>
-    </div>
-  );
-}
-
     <div className="auth-bg">
       <div className="auth-card">
         <div className="auth-logo">
@@ -118,8 +80,8 @@ export default function Login() {
             id="email"
             placeholder="you@example.com"
             required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={formData.email}
+            onChange={handleChange}
           />
           <label htmlFor="password">Password</label>
           <input
@@ -127,8 +89,8 @@ export default function Login() {
             id="password"
             placeholder="Password"
             required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={formData.password}
+            onChange={handleChange}
           />
           <button type="submit" className="auth-btn" disabled={loading}>
             {loading ? "Signing In..." : "Sign In"}
@@ -139,3 +101,5 @@ export default function Login() {
         </form>
       </div>
     </div>
+  );
+}
