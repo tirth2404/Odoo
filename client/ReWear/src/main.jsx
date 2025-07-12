@@ -5,14 +5,14 @@ import "./index.css";
 import App from "./App.jsx";
 import UserDashboard from "./components/UserDashboard.jsx";
 import LoginScreen from "./components/LoginScreen.jsx";
-// import Index from "./Index.jsx"; // If you have a home/index component
+import LandingPage from "./components/LandingPage.jsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
     children: [
-      // { path: "/", element: <Index /> },
+      { path: "/", element: <LandingPage /> },
       { path: "login", element: <LoginScreen /> },
       { path: "userDashboard", element: <UserDashboard /> },
     ],

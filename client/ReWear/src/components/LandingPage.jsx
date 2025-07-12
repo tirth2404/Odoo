@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import styles from "./LandingPage.module.css";
-import { 
-  FaUserCircle, 
-  FaSearch, 
-  FaHome, 
-  FaTshirt, 
-  FaExchangeAlt, 
+import { Link } from "react-router-dom";
+import {
+  FaUserCircle,
+  FaSearch,
+  FaHome,
+  FaTshirt,
+  FaExchangeAlt,
   FaLeaf,
   FaChevronLeft,
   FaChevronRight,
@@ -15,7 +16,7 @@ import {
   FaClock,
   FaRecycle,
   FaTree,
-  FaWater
+  FaWater,
 } from "react-icons/fa";
 
 const LandingPage = () => {
@@ -36,7 +37,7 @@ const LandingPage = () => {
       points: 150,
       image: "👕",
       type: "trending",
-      location: "New York"
+      location: "New York",
     },
     {
       id: 2,
@@ -47,7 +48,7 @@ const LandingPage = () => {
       points: 120,
       image: "👗",
       type: "popular",
-      location: "Los Angeles"
+      location: "Los Angeles",
     },
     {
       id: 3,
@@ -58,7 +59,7 @@ const LandingPage = () => {
       points: 200,
       image: "👟",
       type: "recent",
-      location: "Chicago"
+      location: "Chicago",
     },
     {
       id: 4,
@@ -69,7 +70,7 @@ const LandingPage = () => {
       points: 180,
       image: "👜",
       type: "trending",
-      location: "Miami"
+      location: "Miami",
     },
     {
       id: 5,
@@ -80,8 +81,8 @@ const LandingPage = () => {
       points: 100,
       image: "🧥",
       type: "popular",
-      location: "Seattle"
-    }
+      location: "Seattle",
+    },
   ];
 
   // Categories
@@ -91,7 +92,7 @@ const LandingPage = () => {
     { id: 3, name: "Kids", icon: "👶", count: "1.8K items" },
     { id: 4, name: "Accessories", icon: "👜", count: "3.1K items" },
     { id: 5, name: "Footwear", icon: "👟", count: "2.9K items" },
-    { id: 6, name: "Outerwear", icon: "🧥", count: "1.6K items" }
+    { id: 6, name: "Outerwear", icon: "🧥", count: "1.6K items" },
   ];
 
   // Product listings
@@ -103,7 +104,7 @@ const LandingPage = () => {
       condition: "Excellent",
       points: 120,
       image: "👖",
-      location: "New York"
+      location: "New York",
     },
     {
       id: 2,
@@ -112,7 +113,7 @@ const LandingPage = () => {
       condition: "Good",
       points: 90,
       image: "👗",
-      location: "Los Angeles"
+      location: "Los Angeles",
     },
     {
       id: 3,
@@ -121,7 +122,7 @@ const LandingPage = () => {
       condition: "Like New",
       points: 250,
       image: "🧥",
-      location: "Chicago"
+      location: "Chicago",
     },
     {
       id: 4,
@@ -130,7 +131,7 @@ const LandingPage = () => {
       condition: "Excellent",
       points: 180,
       image: "👟",
-      location: "Miami"
+      location: "Miami",
     },
     {
       id: 5,
@@ -139,7 +140,7 @@ const LandingPage = () => {
       condition: "Good",
       points: 75,
       image: "👚",
-      location: "Seattle"
+      location: "Seattle",
     },
     {
       id: 6,
@@ -148,7 +149,7 @@ const LandingPage = () => {
       condition: "Excellent",
       points: 300,
       image: "👜",
-      location: "Boston"
+      location: "Boston",
     },
     {
       id: 7,
@@ -157,7 +158,7 @@ const LandingPage = () => {
       condition: "Good",
       points: 60,
       image: "👕",
-      location: "Austin"
+      location: "Austin",
     },
     {
       id: 8,
@@ -166,8 +167,8 @@ const LandingPage = () => {
       condition: "Like New",
       points: 220,
       image: "👢",
-      location: "Denver"
-    }
+      location: "Denver",
+    },
   ];
 
   // Testimonials
@@ -176,18 +177,20 @@ const LandingPage = () => {
       id: 1,
       name: "Sarah Johnson",
       role: "Fashion Enthusiast",
-      quote: "ReWear has completely changed how I think about fashion. I've saved money and the planet!",
+      quote:
+        "ReWear has completely changed how I think about fashion. I've saved money and the planet!",
       rating: 5,
-      avatar: "👩‍🦰"
+      avatar: "👩‍🦰",
     },
     {
       id: 2,
       name: "Mike Chen",
       role: "Environmental Advocate",
-      quote: "Finally, a platform that makes sustainable fashion accessible and fun for everyone.",
+      quote:
+        "Finally, a platform that makes sustainable fashion accessible and fun for everyone.",
       rating: 5,
-      avatar: "👨‍🦱"
-    }
+      avatar: "👨‍🦱",
+    },
   ];
 
   // Search functionality
@@ -199,35 +202,37 @@ const LandingPage = () => {
     }
 
     setIsSearching(true);
-    
+
     // Simulate search delay
     setTimeout(() => {
       const lowerQuery = query.toLowerCase();
-      
+
       // Search in products
-      const productResults = products.filter(product =>
-        product.name.toLowerCase().includes(lowerQuery) ||
-        product.category?.toLowerCase().includes(lowerQuery) ||
-        product.condition.toLowerCase().includes(lowerQuery) ||
-        product.location.toLowerCase().includes(lowerQuery)
+      const productResults = products.filter(
+        (product) =>
+          product.name.toLowerCase().includes(lowerQuery) ||
+          product.category?.toLowerCase().includes(lowerQuery) ||
+          product.condition.toLowerCase().includes(lowerQuery) ||
+          product.location.toLowerCase().includes(lowerQuery)
       );
 
       // Search in categories
-      const categoryResults = categories.filter(category =>
+      const categoryResults = categories.filter((category) =>
         category.name.toLowerCase().includes(lowerQuery)
       );
 
       // Search in featured items
-      const featuredResults = featuredItems.filter(item =>
-        item.name.toLowerCase().includes(lowerQuery) ||
-        item.category.toLowerCase().includes(lowerQuery) ||
-        item.location.toLowerCase().includes(lowerQuery)
+      const featuredResults = featuredItems.filter(
+        (item) =>
+          item.name.toLowerCase().includes(lowerQuery) ||
+          item.category.toLowerCase().includes(lowerQuery) ||
+          item.location.toLowerCase().includes(lowerQuery)
       );
 
       const allResults = [
-        ...productResults.map(item => ({ ...item, type: 'product' })),
-        ...categoryResults.map(item => ({ ...item, type: 'category' })),
-        ...featuredResults.map(item => ({ ...item, type: 'featured' }))
+        ...productResults.map((item) => ({ ...item, type: "product" })),
+        ...categoryResults.map((item) => ({ ...item, type: "category" })),
+        ...featuredResults.map((item) => ({ ...item, type: "featured" })),
       ];
 
       setSearchResults(allResults);
@@ -240,7 +245,7 @@ const LandingPage = () => {
   const handleSearchChange = (e) => {
     const query = e.target.value;
     setSearchQuery(query);
-    
+
     if (query.length >= 2) {
       performSearch(query);
     } else {
@@ -274,9 +279,9 @@ const LandingPage = () => {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -293,7 +298,9 @@ const LandingPage = () => {
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + featuredItems.length) % featuredItems.length);
+    setCurrentSlide(
+      (prev) => (prev - 1 + featuredItems.length) % featuredItems.length
+    );
   };
 
   return (
@@ -306,7 +313,7 @@ const LandingPage = () => {
               <FaLeaf className={styles.logoIcon} />
               <span className={styles.logoText}>ReWear</span>
             </div>
-            
+
             <nav className={styles.navigation}>
               <a href="#home" className={styles.navLink}>
                 <FaHome className={styles.navIcon} />
@@ -333,7 +340,7 @@ const LandingPage = () => {
                   />
                   {isSearching && <div className={styles.searchSpinner}></div>}
                 </div>
-                
+
                 {showSearchResults && (
                   <div className={styles.searchResults}>
                     {searchResults.length > 0 ? (
@@ -348,24 +355,26 @@ const LandingPage = () => {
                             onClick={() => handleSearchResultClick(result)}
                           >
                             <div className={styles.searchResultIcon}>
-                              {result.type === 'product' && <FaTshirt />}
-                              {result.type === 'category' && <FaLeaf />}
-                              {result.type === 'featured' && <FaStar />}
+                              {result.type === "product" && <FaTshirt />}
+                              {result.type === "category" && <FaLeaf />}
+                              {result.type === "featured" && <FaStar />}
                             </div>
                             <div className={styles.searchResultContent}>
-                              <div className={styles.searchResultName}>{result.name}</div>
+                              <div className={styles.searchResultName}>
+                                {result.name}
+                              </div>
                               <div className={styles.searchResultMeta}>
-                                {result.type === 'product' && (
+                                {result.type === "product" && (
                                   <>
                                     <span>{result.condition}</span>
                                     <span>{result.points} pts</span>
                                     <span>{result.location}</span>
                                   </>
                                 )}
-                                {result.type === 'category' && (
+                                {result.type === "category" && (
                                   <span>{result.count}</span>
                                 )}
-                                {result.type === 'featured' && (
+                                {result.type === "featured" && (
                                   <>
                                     <span>{result.category}</span>
                                     <span>{result.points} pts</span>
@@ -394,8 +403,15 @@ const LandingPage = () => {
           </div>
 
           <div className={styles.headerRight}>
-            <a href="#login" className={styles.authLink}>Login</a>
-            <a href="#signup" className={`${styles.authLink} ${styles.signupBtn}`}>Sign Up</a>
+            <Link to="/login" className={styles.authLink}>
+              Login
+            </Link>
+            <Link
+              to="/signup"
+              className={`${styles.authLink} ${styles.signupBtn}`}
+            >
+              Sign Up
+            </Link>
             <button className={styles.profileBtn}>
               <FaUserCircle size={24} />
             </button>
@@ -411,8 +427,8 @@ const LandingPage = () => {
               Sustainable Fashion for a Better Tomorrow
             </h1>
             <p className={styles.heroSubtitle}>
-              Join thousands of fashion-conscious individuals making sustainable choices. 
-              Swap, share, and save the planet one outfit at a time.
+              Join thousands of fashion-conscious individuals making sustainable
+              choices. Swap, share, and save the planet one outfit at a time.
             </p>
             <div className={styles.heroButtons}>
               <button className={`${styles.heroBtn} ${styles.primaryBtn}`}>
@@ -451,9 +467,9 @@ const LandingPage = () => {
             </button>
           </div>
         </div>
-        
+
         <div className={styles.carouselContainer}>
-          <div 
+          <div
             className={styles.carouselTrack}
             style={{ transform: `translateX(-${currentSlide * 100}%)` }}
           >
@@ -463,9 +479,17 @@ const LandingPage = () => {
                   <div className={styles.itemImage}>
                     <span className={styles.itemEmoji}>{item.image}</span>
                     <div className={styles.itemBadge}>
-                      {item.type === 'trending' && <span className={styles.trendingBadge}>🔥 Trending</span>}
-                      {item.type === 'popular' && <span className={styles.popularBadge}>⭐ Popular</span>}
-                      {item.type === 'recent' && <span className={styles.recentBadge}>🆕 Recent</span>}
+                      {item.type === "trending" && (
+                        <span className={styles.trendingBadge}>
+                          🔥 Trending
+                        </span>
+                      )}
+                      {item.type === "popular" && (
+                        <span className={styles.popularBadge}>⭐ Popular</span>
+                      )}
+                      {item.type === "recent" && (
+                        <span className={styles.recentBadge}>🆕 Recent</span>
+                      )}
                     </div>
                   </div>
                   <div className={styles.itemInfo}>
@@ -473,10 +497,14 @@ const LandingPage = () => {
                     <p className={styles.itemCategory}>{item.category}</p>
                     <div className={styles.itemDetails}>
                       <span className={styles.itemSize}>Size: {item.size}</span>
-                      <span className={styles.itemCondition}>{item.condition}</span>
+                      <span className={styles.itemCondition}>
+                        {item.condition}
+                      </span>
                     </div>
                     <div className={styles.itemMeta}>
-                      <span className={styles.itemPoints}>{item.points} pts</span>
+                      <span className={styles.itemPoints}>
+                        {item.points} pts
+                      </span>
                       <span className={styles.itemLocation}>
                         <FaMapMarkerAlt className={styles.locationIcon} />
                         {item.location}
@@ -489,12 +517,14 @@ const LandingPage = () => {
             ))}
           </div>
         </div>
-        
+
         <div className={styles.carouselDots}>
           {featuredItems.map((_, index) => (
             <button
               key={index}
-              className={`${styles.dot} ${index === currentSlide ? styles.activeDot : ''}`}
+              className={`${styles.dot} ${
+                index === currentSlide ? styles.activeDot : ""
+              }`}
               onClick={() => setCurrentSlide(index)}
             />
           ))}
@@ -506,7 +536,7 @@ const LandingPage = () => {
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>Browse Categories</h2>
         </div>
-        
+
         <div className={styles.categoriesGrid}>
           {categories.map((category) => (
             <div key={category.id} className={styles.categoryCard}>
@@ -531,7 +561,7 @@ const LandingPage = () => {
             <button className={styles.filterBtn}>Popular</button>
           </div>
         </div>
-        
+
         <div className={styles.productsGrid}>
           {products.map((product) => (
             <div key={product.id} className={styles.productCard}>
@@ -544,11 +574,17 @@ const LandingPage = () => {
               <div className={styles.productInfo}>
                 <h3 className={styles.productName}>{product.name}</h3>
                 <div className={styles.productDetails}>
-                  <span className={styles.productSize}>Size: {product.size}</span>
-                  <span className={styles.productCondition}>{product.condition}</span>
+                  <span className={styles.productSize}>
+                    Size: {product.size}
+                  </span>
+                  <span className={styles.productCondition}>
+                    {product.condition}
+                  </span>
                 </div>
                 <div className={styles.productMeta}>
-                  <span className={styles.productPoints}>{product.points} pts</span>
+                  <span className={styles.productPoints}>
+                    {product.points} pts
+                  </span>
                   <span className={styles.productLocation}>
                     <FaMapMarkerAlt className={styles.locationIcon} />
                     {product.location}
@@ -556,7 +592,9 @@ const LandingPage = () => {
                 </div>
                 <div className={styles.productActions}>
                   <button className={styles.viewBtn}>View Details</button>
-                  <button className={styles.swapRequestBtn}>Request Swap</button>
+                  <button className={styles.swapRequestBtn}>
+                    Request Swap
+                  </button>
                 </div>
               </div>
             </div>
@@ -569,13 +607,15 @@ const LandingPage = () => {
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>Community Impact</h2>
         </div>
-        
+
         <div className={styles.testimonialsContent}>
           <div className={styles.impactMetrics}>
             <div className={styles.metricCard}>
               <FaRecycle className={styles.metricIcon} />
               <div className={styles.metricValue}>2,000+</div>
-              <div className={styles.metricLabel}>Garments Saved from Landfill</div>
+              <div className={styles.metricLabel}>
+                Garments Saved from Landfill
+              </div>
             </div>
             <div className={styles.metricCard}>
               <FaTree className={styles.metricIcon} />
@@ -588,16 +628,20 @@ const LandingPage = () => {
               <div className={styles.metricLabel}>Water Saved</div>
             </div>
           </div>
-          
+
           <div className={styles.testimonialsGrid}>
             {testimonials.map((testimonial) => (
               <div key={testimonial.id} className={styles.testimonialCard}>
                 <div className={styles.testimonialHeader}>
                   <div className={styles.testimonialAvatar}>
-                    <span className={styles.avatarEmoji}>{testimonial.avatar}</span>
+                    <span className={styles.avatarEmoji}>
+                      {testimonial.avatar}
+                    </span>
                   </div>
                   <div className={styles.testimonialInfo}>
-                    <h4 className={styles.testimonialName}>{testimonial.name}</h4>
+                    <h4 className={styles.testimonialName}>
+                      {testimonial.name}
+                    </h4>
                     <p className={styles.testimonialRole}>{testimonial.role}</p>
                     <div className={styles.testimonialRating}>
                       {[...Array(testimonial.rating)].map((_, i) => (
@@ -624,36 +668,59 @@ const LandingPage = () => {
               <span className={styles.logoText}>ReWear</span>
             </div>
             <p className={styles.footerDescription}>
-              Making sustainable fashion accessible to everyone through clothing exchanges.
+              Making sustainable fashion accessible to everyone through clothing
+              exchanges.
             </p>
           </div>
-          
+
           <div className={styles.footerSection}>
             <h4 className={styles.footerTitle}>Quick Links</h4>
-            <a href="#about" className={styles.footerLink}>About Us</a>
-            <a href="#how-it-works" className={styles.footerLink}>How It Works</a>
-            <a href="#sustainability" className={styles.footerLink}>Sustainability</a>
-            <a href="#contact" className={styles.footerLink}>Contact</a>
+            <a href="#about" className={styles.footerLink}>
+              About Us
+            </a>
+            <a href="#how-it-works" className={styles.footerLink}>
+              How It Works
+            </a>
+            <a href="#sustainability" className={styles.footerLink}>
+              Sustainability
+            </a>
+            <a href="#contact" className={styles.footerLink}>
+              Contact
+            </a>
           </div>
-          
+
           <div className={styles.footerSection}>
             <h4 className={styles.footerTitle}>Support</h4>
-            <a href="#help" className={styles.footerLink}>Help Center</a>
-            <a href="#faq" className={styles.footerLink}>FAQ</a>
-            <a href="#terms" className={styles.footerLink}>Terms of Service</a>
-            <a href="#privacy" className={styles.footerLink}>Privacy Policy</a>
+            <a href="#help" className={styles.footerLink}>
+              Help Center
+            </a>
+            <a href="#faq" className={styles.footerLink}>
+              FAQ
+            </a>
+            <a href="#terms" className={styles.footerLink}>
+              Terms of Service
+            </a>
+            <a href="#privacy" className={styles.footerLink}>
+              Privacy Policy
+            </a>
           </div>
-          
+
           <div className={styles.footerSection}>
             <h4 className={styles.footerTitle}>Connect</h4>
             <div className={styles.socialLinks}>
-              <a href="#twitter" className={styles.socialLink}>Twitter</a>
-              <a href="#instagram" className={styles.socialLink}>Instagram</a>
-              <a href="#facebook" className={styles.socialLink}>Facebook</a>
+              <a href="#twitter" className={styles.socialLink}>
+                Twitter
+              </a>
+              <a href="#instagram" className={styles.socialLink}>
+                Instagram
+              </a>
+              <a href="#facebook" className={styles.socialLink}>
+                Facebook
+              </a>
             </div>
           </div>
         </div>
-        
+
         <div className={styles.footerBottom}>
           <p>&copy; 2024 ReWear. All rights reserved.</p>
         </div>
@@ -662,4 +729,4 @@ const LandingPage = () => {
   );
 };
 
-export default LandingPage; 
+export default LandingPage;
