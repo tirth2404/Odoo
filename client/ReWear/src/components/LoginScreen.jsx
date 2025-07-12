@@ -4,39 +4,99 @@ import { FaLeaf } from "react-icons/fa";
 import "../index.css";
 import "./AuthScreen.css";
 
-export default function LoginScreen() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+export default function Login() {
+  const [formData, setFormData] = useState({
+    email: "",
+    password: ""
+  });
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const [error, setError] = useState("");
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.value
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
+    setError("");
+
     try {
-      const res = await fetch("http://localhost:3000/api/auth/login", {
+      const response = await fetch("http://localhost:3000/api/auth/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(formData)
       });
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.message || "Login failed");
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Check user role and redirect accordingly
+        if (data.data.role === 'admin') {
+          // Store admin token and user data
+          localStorage.setItem("adminToken", data.data.token);
+          localStorage.setItem("adminUser", JSON.stringify(data.data));
+          
+          // Redirect to admin dashboard
+          window.location.href = "/admin/dashboard";
+        } else {
+          // Store regular user token and user data
+          localStorage.setItem("token", data.data.token);
+          localStorage.setItem("user", JSON.stringify(data.data));
+          
+          // Redirect to user dashboard
+          window.location.href = "/userDashboard";
+        }
       } else {
-        localStorage.setItem("token", data.data.token);
-        // Optionally store user info
-        localStorage.setItem("user", JSON.stringify(data.data));
-        navigate("/userDashboard");
+        setError(data.message || "Login failed");
       }
     } catch (err) {
-      setError("Network error");
+      setError("Network error. Please try again.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
+    <div className="login-container">
+      <form className="login-form" onSubmit={handleSubmit}>
+        <h1>Login</h1>
+        
+        {error && <div className="error-message">{error}</div>}
+        
+        <label htmlFor="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          placeholder="you@example.com"
+          value={formData.email}
+          onChange={handleChange}
+          required
+        />
+        
+        <label htmlFor="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          placeholder="Password"
+          value={formData.password}
+          onChange={handleChange}
+          required
+        />
+        
+        <button type="submit" disabled={loading}>
+          {loading ? "Signing In..." : "Sign In"}
+        </button>
+        
+        <p className="login-link">
+          Don't have an account? <a href="/register">Register</a>
+        </p>
+      </form>
     <div className="auth-bg">
       <div className="auth-card">
         <div className="auth-logo">
