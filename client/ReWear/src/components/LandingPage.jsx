@@ -333,6 +333,10 @@ const LandingPage = () => {
   // Handle filter button clicks
   const handleFilterClick = (filter) => {
     setActiveFilter(filter);
+    // Clear category filter when "All" is selected
+    if (filter === "All") {
+      setSelectedCategory(null);
+    }
   };
 
   // Handle category clicks
@@ -387,12 +391,17 @@ const LandingPage = () => {
     const token = localStorage.getItem("token");
     if (!token) {
       // Redirect to login if not authenticated
-      window.location.href = "/login";
+      navigate("/login");
       return;
     }
     
     // Navigate to swap request page
-    window.location.href = `/swap-request/${itemId}`;
+    navigate(`/swap-request/${itemId}`);
+  };
+
+  // Handle view full details
+  const handleViewDetails = (itemId) => {
+    navigate(`/item/${itemId}`);
   };
 
   // Check if user is logged in
@@ -839,7 +848,9 @@ const LandingPage = () => {
                     </span>
                   </div>
                   <div className={styles.productActions}>
-                    <button className={styles.viewBtn}>View Details</button>
+                    <button className={styles.viewBtn} onClick={() => handleViewDetails(product._id)}>
+                      View Details
+                    </button>
                     <button className={styles.swapRequestBtn} onClick={() => handleSwapRequest(product._id)}>
                       Request Swap
                     </button>

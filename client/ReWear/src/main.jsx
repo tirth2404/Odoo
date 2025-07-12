@@ -16,6 +16,7 @@ import SwapDashboard from "./components/SwapDashboard.jsx";
 import SwapDetail from "./components/SwapDetail.jsx";
 import SwapRequest from "./components/SwapRequest.jsx";
 import AddItem from "./components/AddItem.jsx";
+import ItemDetail from "./components/ItemDetail.jsx";
 import MensWear from "./components/MensWear.jsx";
 import WomensWear from "./components/WomensWear.jsx";
 import KidsWear from "./components/KidsWear.jsx";
@@ -42,6 +43,7 @@ const router = createBrowserRouter([
       { path: "swaps", element: <SwapDashboard /> },
       { path: "swaps/:swapId", element: <SwapDetail /> },
       { path: "swap-request/:itemId", element: <SwapRequest /> },
+      { path: "item/:itemId", element: <ItemDetail /> },
       { path: "add-item", element: <AddItem /> },
       { path: "mens-wear", element: <MensWear /> },
       { path: "womens-wear", element: <WomensWear /> },
