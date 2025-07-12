@@ -1,8 +1,8 @@
 import React from "react";
-import UserDashboard from "./components/UserDashboard";
+import LandingPage from "./components/LandingPage";
 
 function App() {
-  return <UserDashboard />;
+  return <LandingPage />;
 }
 
 export default App;
