@@ -32,9 +32,7 @@ export default function RegisterScreen() {
       if (!res.ok) {
         setError(data.message || "Registration failed");
       } else {
-        localStorage.setItem("token", data.data.token);
-        localStorage.setItem("user", JSON.stringify(data.data));
-        navigate("/userDashboard");
+        navigate("/login");
       }
     } catch (err) {
       setError("Network error");
