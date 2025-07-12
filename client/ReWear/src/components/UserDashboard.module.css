@@ -28,6 +28,35 @@
   gap: 8px;
 }
 
+.headerTop {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.backButton {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  backdrop-filter: blur(10px);
+  white-space: nowrap;
+}
+
+.backButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
 .title {
   font-size: 2.2rem;
   font-weight: 700;
@@ -627,7 +656,69 @@
 
 .starIcon {
   color: #ffd700;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
+  margin: 0 1px;
+}
+
+/* Loading and Error States */
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* No Activity Message */
+.noActivity {
+  text-align: center;
+  padding: 40px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+}
+
+.noActivity p {
+  color: #a0a0a0;
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* No Items Message */
+.noItems {
+  text-align: center;
+  padding: 60px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  grid-column: 1 / -1;
+}
+
+.noItems p {
+  color: #a0a0a0;
+  font-size: 1.1rem;
+  margin: 0 0 20px 0;
+}
+
+.noItems .addItemBtn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.noItems .addItemBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
 }
 
 /* Responsive Design */
@@ -636,11 +727,20 @@
     margin: 10px;
     padding: 20px;
   }
-  
+
   .header {
     flex-direction: column;
     gap: 16px;
     text-align: center;
+  }
+
+  .headerTop {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .backButton {
+    align-self: flex-start;
   }
   
   .profileSection {
