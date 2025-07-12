@@ -358,6 +358,36 @@ const LandingPage = () => {
     );
   };
 
+  // Handle swap request
+  const handleSwapRequest = (itemId) => {
+    // Check if user is logged in
+    const token = localStorage.getItem("token");
+    if (!token) {
+      // Redirect to login if not authenticated
+      window.location.href = "/login";
+      return;
+    }
+    
+    // Navigate to swap request page
+    window.location.href = `/swap-request/${itemId}`;
+  };
+
+  // Check if user is logged in
+  const isLoggedIn = !!localStorage.getItem("token");
+  const user = isLoggedIn ? JSON.parse(localStorage.getItem("user") || "{}") : null;
+
+  // Handle user profile click
+  const handleUserProfileClick = () => {
+    window.location.href = "/userDashboard";
+  };
+
+  // Handle logout
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    window.location.href = "/";
+  };
+
   const filteredProducts = getFilteredProducts();
 
   return (
@@ -460,18 +490,29 @@ const LandingPage = () => {
           </div>
 
           <div className={styles.headerRight}>
-            <Link to="/login" className={styles.authLink}>
-              Login
-            </Link>
-            <Link
-              to="/register"
-              className={`${styles.authLink} ${styles.signupBtn}`}
-            >
-              Sign Up
-            </Link>
-            <button className={styles.profileBtn}>
-              <FaUserCircle size={24} />
-            </button>
+            {isLoggedIn ? (
+              <>
+                <span className={styles.userName}>Hi, {user?.name || 'User'}</span>
+                <button className={styles.profileBtn} onClick={handleUserProfileClick}>
+                  <FaUserCircle size={24} />
+                </button>
+                <button className={styles.authLink} onClick={handleLogout}>
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className={styles.authLink}>
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  className={`${styles.authLink} ${styles.signupBtn}`}
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -596,7 +637,7 @@ const LandingPage = () => {
                           {item.location}
                         </span>
                       </div>
-                      <button className={styles.swapBtn}>Request Swap</button>
+                      <button className={styles.swapBtn} onClick={() => handleSwapRequest(item._id)}>Request Swap</button>
                     </div>
                   </div>
                 </div>
@@ -760,7 +801,7 @@ const LandingPage = () => {
                   </div>
                   <div className={styles.productActions}>
                     <button className={styles.viewBtn}>View Details</button>
-                    <button className={styles.swapRequestBtn}>
+                    <button className={styles.swapRequestBtn} onClick={() => handleSwapRequest(product._id)}>
                       Request Swap
                     </button>
                   </div>

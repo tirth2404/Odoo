@@ -49,8 +49,8 @@ export default function Login() {
           localStorage.setItem("token", data.data.token);
           localStorage.setItem("user", JSON.stringify(data.data));
 
-          // Redirect to user dashboard
-          window.location.href = "/userDashboard";
+          // Redirect to home page instead of user dashboard
+          window.location.href = "/";
         }
       } else {
         setError(data.message || "Login failed");

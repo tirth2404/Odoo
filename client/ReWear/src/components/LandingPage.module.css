@@ -286,6 +286,13 @@
   gap: 1rem;
 }
 
+.userName {
+  color: #fff;
+  font-weight: 500;
+  font-size: 0.9rem;
+  margin-right: 0.5rem;
+}
+
 .authLink {
   color: #a0a0a0;
   text-decoration: none;
@@ -293,6 +300,10 @@
   transition: all 0.3s ease;
   padding: 0.5rem 1rem;
   border-radius: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
 }
 
 .authLink:hover {

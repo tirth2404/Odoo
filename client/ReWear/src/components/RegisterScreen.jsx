@@ -34,7 +34,28 @@ export default function RegisterScreen() {
       if (!res.ok) {
         setError(data.message || "Registration failed");
       } else {
-        navigate("/login");
+        // Auto-login after successful registration
+        const loginRes = await fetch("http://localhost:3000/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: form.email,
+            password: form.password
+          }),
+        });
+        
+        const loginData = await loginRes.json();
+        if (loginData.success) {
+          // Store user token and data
+          localStorage.setItem("token", loginData.data.token);
+          localStorage.setItem("user", JSON.stringify(loginData.data));
+          
+          // Redirect to home page
+          window.location.href = "/";
+        } else {
+          // If auto-login fails, redirect to login page
+          navigate("/login");
+        }
       }
     } catch (err) {
       setError("Network error");
