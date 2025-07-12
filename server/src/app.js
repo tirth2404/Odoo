@@ -6,6 +6,9 @@ const app = express();
 
 // Import routes
 const authRoutes = require('./routes/auth');
+const itemRoutes = require('./routes/items');
+const adminRoutes = require('./routes/admin');
+const swapRoutes = require('./routes/swapRoutes');
 
 // Middleware - ORDER MATTERS!
 app.use(cors());
@@ -23,6 +26,10 @@ app.use((req, res, next) => {
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/items', itemRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/swaps', swapRoutes);
+app.use('/uploads', express.static('uploads'));
 
 // Test route
 app.get('/api/health', (req, res) => {

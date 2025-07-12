@@ -1,0 +1,373 @@
+const Item = require('../models/Item');
+
+// @desc    Create new item
+// @route   POST /api/items
+// @access  Private
+exports.createItem = async (req, res) => {
+  try {
+    const {
+      title, description, category, subcategory, type, size, condition,
+      brand, color, material, season, tags, pointsValue, location
+    } = req.body;
+
+    // Parse tags if sent as JSON string
+    let tagsArray = [];
+    try {
+      tagsArray = typeof tags === 'string' ? JSON.parse(tags) : [];
+    } catch {
+      tagsArray = [];
+    }
+
+    // Handle images
+    const images = req.files ? req.files.map(file => ({
+      url: `/uploads/${file.filename}`,
+      public_id: file.filename
+    })) : [];
+
+    const item = await Item.create({
+      title,
+      description,
+      category,
+      subcategory,
+      type,
+      size,
+      condition,
+      brand,
+      color,
+      material,
+      season,
+      tags: tagsArray,
+      pointsValue,
+      location,
+      images,
+      owner: req.user._id
+    });
+
+    res.status(201).json({
+      success: true,
+      data: item
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+// @desc    Get all items with filters
+// @route   GET /api/items
+// @access  Public
+exports.getItems = async (req, res) => {
+  try {
+    const {
+      category,
+      subcategory,
+      type,
+      size,
+      condition,
+      brand,
+      color,
+      season,
+      minPoints,
+      maxPoints,
+      search,
+      sort = 'newest',
+      page = 1,
+      limit = 12
+    } = req.query;
+
+    // Build filter object
+    const filter = {
+      status: 'available',
+      isApproved: true
+    };
+
+    if (category) filter.category = category;
+    if (subcategory) filter.subcategory = subcategory;
+    if (type) filter.type = type;
+    if (size) filter.size = size;
+    if (condition) filter.condition = condition;
+    if (brand) filter.brand = { $regex: brand, $options: 'i' };
+    if (color) filter.color = { $regex: color, $options: 'i' };
+    if (season) filter.season = season;
+    if (minPoints || maxPoints) {
+      filter.pointsValue = {};
+      if (minPoints) filter.pointsValue.$gte = parseInt(minPoints);
+      if (maxPoints) filter.pointsValue.$lte = parseInt(maxPoints);
+    }
+
+    // Text search
+    if (search) {
+      filter.$text = { $search: search };
+    }
+
+    // Build sort object
+    let sortObj = {};
+    switch (sort) {
+      case 'newest':
+        sortObj = { createdAt: -1 };
+        break;
+      case 'oldest':
+        sortObj = { createdAt: 1 };
+        break;
+      case 'points-low':
+        sortObj = { pointsValue: 1 };
+        break;
+      case 'points-high':
+        sortObj = { pointsValue: -1 };
+        break;
+      case 'most-liked':
+        sortObj = { likeCount: -1 };
+        break;
+      case 'most-viewed':
+        sortObj = { views: -1 };
+        break;
+      default:
+        sortObj = { createdAt: -1 };
+    }
+
+    // Pagination
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    // Get items with featured items first
+    const featuredItems = await Item.find({ ...filter, isFeatured: true })
+      .populate('owner', 'name location')
+      .sort(sortObj)
+      .limit(parseInt(limit));
+
+    const regularItems = await Item.find({ ...filter, isFeatured: false })
+      .populate('owner', 'name location')
+      .sort(sortObj)
+      .skip(skip)
+      .limit(parseInt(limit) - featuredItems.length);
+
+    const items = [...featuredItems, ...regularItems];
+
+    // Get total count for pagination
+    const total = await Item.countDocuments(filter);
+
+    res.json({
+      success: true,
+      data: items,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        pages: Math.ceil(total / parseInt(limit))
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+// @desc    Get featured items
+// @route   GET /api/items/featured
+// @access  Public
+exports.getFeaturedItems = async (req, res) => {
+  try {
+    const items = await Item.find({
+      isFeatured: true,
+      status: 'available',
+      isApproved: true
+    })
+    .populate('owner', 'name location')
+    .sort({ featuredAt: -1 })
+    .limit(10);
+
+    res.json({
+      success: true,
+      data: items
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+// @desc    Get categories
+// @route   GET /api/items/categories
+// @access  Public
+exports.getCategories = async (req, res) => {
+  try {
+    const categories = [
+      "men's clothing",
+      "women's clothing", 
+      "kids",
+      "accessories",
+      "footwear",
+      "outerwear"
+    ];
+
+    res.json({
+      success: true,
+      data: categories
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+// @desc    Get single item
+// @route   GET /api/items/:id
+// @access  Public
+exports.getItem = async (req, res) => {
+  try {
+    const item = await Item.findById(req.params.id)
+      .populate('owner', 'name location bio avatar')
+      .populate('likes', 'name');
+
+    if (!item) {
+      return res.status(404).json({
+        success: false,
+        message: 'Item not found'
+      });
+    }
+
+    // Increment views
+    await item.incrementViews();
+
+    res.json({
+      success: true,
+      data: item
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+// @desc    Update item
+// @route   PUT /api/items/:id
+// @access  Private (owner only)
+exports.updateItem = async (req, res) => {
+  try {
+    const item = await Item.findById(req.params.id);
+
+    if (!item) {
+      return res.status(404).json({
+        success: false,
+        message: 'Item not found'
+      });
+    }
+
+    // Check ownership
+    if (item.owner.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Not authorized to update this item'
+      });
+    }
+
+    const updatedItem = await Item.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    ).populate('owner', 'name location');
+
+    res.json({
+      success: true,
+      data: updatedItem
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+// @desc    Delete item
+// @route   DELETE /api/items/:id
+// @access  Private (owner only)
+exports.deleteItem = async (req, res) => {
+  try {
+    const item = await Item.findById(req.params.id);
+
+    if (!item) {
+      return res.status(404).json({
+        success: false,
+        message: 'Item not found'
+      });
+    }
+
+    // Check ownership
+    if (item.owner.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Not authorized to delete this item'
+      });
+    }
+
+    await item.remove();
+
+    res.json({
+      success: true,
+      message: 'Item deleted successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+// @desc    Like/unlike item
+// @route   POST /api/items/:id/like
+// @access  Private
+exports.toggleLike = async (req, res) => {
+  try {
+    const item = await Item.findById(req.params.id);
+
+    if (!item) {
+      return res.status(404).json({
+        success: false,
+        message: 'Item not found'
+      });
+    }
+
+    await item.toggleLike(req.user._id);
+
+    res.json({
+      success: true,
+      data: item
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+// @desc    Get user's own items
+// @route   GET /api/items/my-items
+// @access  Private
+exports.getMyItems = async (req, res) => {
+  try {
+    const items = await Item.find({ owner: req.user._id })
+      .sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      data: items
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+}; 

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./UserDashboard.module.css";
 import { 
   FaUserCircle, 
@@ -23,6 +24,7 @@ import {
 } from "react-icons/fa";
 
 const UserDashboard = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [notifications, setNotifications] = useState(3);
 
@@ -63,7 +65,7 @@ const UserDashboard = () => {
   const quickActions = [
     { icon: FaPlus, label: 'Add Item', action: 'add' },
     { icon: FaSearch, label: 'Browse', action: 'browse' },
-    { icon: FaExchangeAlt, label: 'Swap', action: 'swap' },
+    { icon: FaExchangeAlt, label: 'My Swaps', action: 'swaps' },
     { icon: FaCoins, label: 'Redeem', action: 'redeem' }
   ];
 
@@ -104,7 +106,11 @@ const UserDashboard = () => {
         <h2 className={styles.sectionTitle}>Quick Actions</h2>
         <div className={styles.quickActionsGrid}>
           {quickActions.map((action, index) => (
-            <button key={index} className={styles.quickActionBtn}>
+            <button 
+              key={index} 
+              className={styles.quickActionBtn}
+              onClick={() => handleQuickAction(action.action)}
+            >
               <action.icon className={styles.actionIcon} />
               <span>{action.label}</span>
             </button>
@@ -145,7 +151,10 @@ const UserDashboard = () => {
     <div className={styles.closetContent}>
       <div className={styles.closetHeader}>
         <h2>My Closet</h2>
-        <button className={styles.addItemBtn}>
+        <button 
+          className={styles.addItemBtn}
+          onClick={() => navigate('/add-item')}
+        >
           <FaPlus /> Add New Item
         </button>
       </div>
@@ -214,6 +223,25 @@ const UserDashboard = () => {
       </div>
     </div>
   );
+
+  const handleQuickAction = (action) => {
+    switch (action) {
+      case 'add':
+        navigate('/add-item');
+        break;
+      case 'browse':
+        navigate('/browse');
+        break;
+      case 'swaps':
+        navigate('/swaps');
+        break;
+      case 'redeem':
+        navigate('/redeem');
+        break;
+      default:
+        break;
+    }
+  };
 
   return (
     <div className={styles.dashboardContainer}>
